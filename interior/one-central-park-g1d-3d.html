@@ -1,0 +1,1096 @@
+<title>壹號院 G1-D 가구 배치</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-height 3D stage on the left, spec sheet (selected piece + schedule by room) on the right; stacks on phones. */
+:root {
+  --bg: #F2F2EF;
+  --panel: #FBFBFA;
+  --fg: #1C2024;
+  --muted: #5E656B;
+  --line: #DCDDDA;
+  --accent: #86653A;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #EFE7DA;
+  --stage: #E6E7E3;
+  --chip: #ECEBE7;
+  --label-bg: rgba(251, 251, 250, 0.88);
+  --font-display: "Manrope", "Noto Sans KR", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", "Manrope", "PingFang SC", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171A; --panel: #1B1F23; --fg: #E8EBED; --muted: #9AA2A9; --line: #2D3338;
+    --accent: #CDA770; --accent-ink: #17140F; --accent-soft: #2E2820; --stage: #20252A; --chip: #262B30;
+    --label-bg: rgba(27, 31, 35, 0.86); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171A; --panel: #1B1F23; --fg: #E8EBED; --muted: #9AA2A9; --line: #2D3338;
+  --accent: #CDA770; --accent-ink: #17140F; --accent-soft: #2E2820; --stage: #20252A; --chip: #262B30;
+  --label-bg: rgba(27, 31, 35, 0.86); color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 390px; grid-template-rows: auto minmax(0, 1fr); }
+.bar { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px;
+  padding-block: 14px 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; border-bottom: 1px solid var(--line); }
+.eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; margin: 2px 0 0; text-wrap: balance; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { border: 0; background: transparent; padding: 6px 11px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg button:hover:not([aria-pressed="true"]) { background: var(--chip); }
+.toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); cursor: pointer; user-select: none; }
+.toggle input { accent-color: var(--accent); }
+
+.stage { grid-column: 1; grid-row: 2; position: relative; min-height: 0; background: var(--stage); overflow: hidden; }
+.stage canvas { display: block; touch-action: none; }
+.css2d { position: absolute; inset: 0; pointer-events: none; }
+.hint { position: absolute; left: max(12px, env(safe-area-inset-left, 0px)); right: 66px; width: fit-content; bottom: 12px; font-size: 11.5px; color: var(--muted);
+  background: var(--label-bg); padding: 4px 9px; border-radius: 6px; pointer-events: none; }
+.compass { position: absolute; right: 14px; bottom: 12px; width: 42px; height: 42px; pointer-events: none; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
+
+.rl { pointer-events: none; text-align: center; transform: translateY(-2px); }
+.rl b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 12px; color: var(--fg); letter-spacing: 0.01em; }
+.rl span { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.rl.dim b { color: var(--muted); font-weight: 500; }
+.fl { display: none; pointer-events: none; background: var(--label-bg); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px;
+  font-size: 11px; white-space: nowrap; color: var(--fg); backdrop-filter: blur(4px); }
+.fl i { font-style: normal; color: var(--muted); }
+.show-all .fl, .fl.sel { display: block; }
+.fl.sel { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.fl.sel i { color: var(--accent-ink); opacity: 0.8; }
+
+.side { grid-column: 2; grid-row: 1 / 3; border-left: 1px solid var(--line); background: var(--panel); overflow-y: auto; min-width: 0;
+  padding-block: 16px 28px; padding-left: 18px; padding-right: max(18px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 22px; }
+.sec-h { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+
+.card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 15px; background: var(--bg); display: flex; flex-direction: column; gap: 10px; }
+.card .top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); }
+.pill.fixed { background: var(--accent); color: var(--accent-ink); }
+.pill.prop { background: var(--accent-soft); color: var(--accent); }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.2; }
+.model { font-size: 15px; font-weight: 500; }
+.kv { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 4px 10px; font-size: 12.5px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.note { font-size: 13px; color: var(--fg); border-top: 1px solid var(--line); padding-top: 10px; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { border-top: 2px solid var(--fg); padding-top: 6px; }
+.stat b { display: block; font-family: var(--font-display); font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 11.5px; color: var(--muted); }
+
+.room { border-top: 1px solid var(--line); padding-top: 10px; }
+.room + .room { margin-top: 12px; }
+.room-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.room-h b { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; }
+.room-h span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.items button { width: 100%; text-align: left; border: 0; background: transparent; border-radius: 7px; padding: 6px 8px; cursor: pointer;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; align-items: baseline; }
+.items button:hover { background: var(--chip); }
+.items button[aria-current="true"] { background: var(--accent-soft); }
+.items .b { font-weight: 700; font-size: 13px; min-width: 0; }
+.items .m { color: var(--muted); font-weight: 400; }
+.items .c { font-size: 11.5px; color: var(--muted); grid-column: 1; }
+.items .d { font-family: var(--font-mono); font-size: 11px; color: var(--muted); grid-row: 1 / 3; grid-column: 2; align-self: center; }
+.items .star { color: var(--accent); }
+.foot { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
+.foot p { margin: 0 0 6px; }
+
+@media (max-width: 880px) {
+  html, body { height: auto; }
+  .app { display: block; height: auto; }
+  .bar { padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .stage { height: 62svh; min-height: 360px; }
+  .side { border-left: 0; border-top: 1px solid var(--line); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header class="bar">
+    <div>
+      <div class="eyebrow">上海壹號院 · G1-D · 335㎡ · 4房2厅4卫</div>
+      <h1>壹號院 G1-D 가구 배치</h1>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="시점">
+        <button id="v-overview" data-view="overview" aria-pressed="true">전체</button>
+        <button id="v-top" data-view="top" aria-pressed="false">평면</button>
+        <button id="v-living" data-view="living" aria-pressed="false">거실</button>
+        <button id="v-dining" data-view="dining" aria-pressed="false">다이닝</button>
+        <button id="v-master" data-view="master" aria-pressed="false">마스터</button>
+        <button id="v-beds" data-view="beds" aria-pressed="false">침실</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="t-walls"> 벽 전체 높이</label>
+      <label class="toggle"><input type="checkbox" id="t-labels"> 브랜드 라벨 전부</label>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="loading" id="loading">3D 모델 불러오는 중…</div>
+    <div class="css2d" id="css2d"></div>
+    <div class="hint">드래그: 회전 · 우클릭/두 손가락: 이동 · 휠: 확대 · 가구 클릭: 상세</div>
+    <svg class="compass" viewBox="0 0 42 42" aria-label="북쪽 표시">
+      <circle cx="21" cy="21" r="19" fill="var(--label-bg)" stroke="var(--line)"></circle>
+      <path id="needle" d="M21 7 L26 23 L21 20 L16 23 Z" fill="var(--fg)"></path>
+      <text x="21" y="35" text-anchor="middle" font-size="9" font-family="IBM Plex Mono, monospace" fill="var(--muted)">N</text>
+    </svg>
+  </main>
+
+  <aside class="side">
+    <section>
+      <h2 class="sec-h">선택한 가구</h2>
+      <div class="card" id="detail"></div>
+    </section>
+    <section>
+      <div class="stats" id="stats"></div>
+    </section>
+    <section>
+      <h2 class="sec-h">공간별 가구 스케줄</h2>
+      <div id="schedule"></div>
+    </section>
+    <section class="foot">
+      <p>평면 치수는 분양 도면(외곽 18.0 × 25.6 m) 기준으로 모델링했고, 내벽 위치는 도면 판독 기준 ±10 cm 수준의 추정치입니다.</p>
+      <p>가구 치수는 각 브랜드 대표 사양입니다. 모듈 구성, 패브릭, 가죽 등급은 매장 견적에서 확정합니다.</p>
+      <p>확정 표시는 직접 정한 가구, 제안 표시는 배치안입니다.</p>
+    </section>
+  </aside>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ============================================================
+   1. FLOOR PLAN DATA  (plan mm; x → east, y → south; origin = NW corner of 18000 × 25600 envelope)
+   ============================================================ */
+const ROOMS = [
+  { id: 'balcony', ko: '발코니', zh: '阳台', area: 5.46, rects: [[0,0,3600,1800]], floor: 'stoneDark', ext: { N: 'rail', W: 'rail' }, corner: { c: 'TL', r: 1200 }, label: [1800, 380] },
+  { id: 'bed4', ko: '게스트 침실', zh: '次卧', area: 14.54, rects: [[0,1800,3600,5650],[3600,3800,5000,5650]], floor: 'oak', ext: { W: 'glass' }, label: [1700, 2700] },
+  { id: 'equip', ko: '설비실', zh: '设备间', area: 5.93, rects: [[3600,0,7250,1800]], floor: 'tile', ext: { N: 'wall' }, label: [5300, 1250] },
+  { id: 'bath1', ko: '욕실 1', zh: '卫生间', area: 5.19, rects: [[3600,1800,6400,3800]], floor: 'tile', label: [5200, 3100] },
+  { id: 'shaft1', solid: true, rects: [[6400,1800,7250,3800]] },
+  { id: 'kitchen', ko: '중식 주방', zh: '厨房', area: 14.74, rects: [[7250,0,11300,3800]], floor: 'stoneDark', ext: { N: 'wall' }, label: [8400, 3250] },
+  { id: 'col1', solid: true, rects: [[11300,0,11600,3800]] },
+  { id: 'family', ko: '패밀리룸', zh: '家庭活动室', area: 10.92, rects: [[11600,0,14600,3800]], floor: 'oak', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1200 }, label: [12500, 3450] },
+  { id: 'corrN', ko: '복도', zh: '走道', area: 11.16, rects: [[5000,3800,9450,5650],[9450,3800,14000,4350]], floor: 'marble', label: [7300, 4750] },
+  { id: 'col2', solid: true, rects: [[14000,3800,14600,4350]] },
+  { id: 'living', ko: '거실 · 다이닝 · 서양식 주방', zh: '客厅 · 餐厅 · 西厨', area: 65.10, rects: [[9450,4350,17200,12000],[11550,12000,17200,14650]], floor: 'marble', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1500 }, label: [13000, 9400] },
+  { id: 'core', ko: '공용 코어', zh: '楼梯 · 电梯', rects: [[0,5650,9450,11000],[0,11000,6450,16750]], floor: 'core', ext: {}, label: [2300, 10200], dim: true },
+  { id: 'lift', ko: '전용 엘리베이터 홀', zh: '电梯厅', area: 13.69, rects: [[6450,11000,9450,12000],[6450,12000,9050,16750]], floor: 'marble', label: [7700, 12600] },
+  { id: 'foyer', ko: '현관', zh: '玄关', area: 5.35, rects: [[9050,12000,11550,14650]], floor: 'marble', label: [10300, 13100] },
+  { id: 'bath2', ko: '게스트 욕실', zh: '卫生间', area: 5.28, rects: [[9050,14650,11550,16750]], floor: 'tile', label: [10700, 15250] },
+  { id: 'corrS', ko: '복도', zh: '走道', area: 8.45, rects: [[8700,16750,12850,18500],[11550,14650,12850,16750]], floor: 'oak', label: [10800, 17600] },
+  { id: 'bath3', ko: '욕실 3', zh: '卫生间', area: 5.63, rects: [[6450,16750,8700,20250]], floor: 'tile', ext: { W: 'wall' }, label: [7800, 17300] },
+  { id: 'bed3', ko: '침실 3', zh: '次卧', area: 19.89, rects: [[6450,20250,10350,25600],[8700,18500,10350,20250]], floor: 'oak', ext: { W: 'wall', S: 'glass', E: 'glass' }, corner: { c: 'BR', r: 1200 }, label: [8100, 21000] },
+  { id: 'bed2', ko: '침실 2', zh: '次卧', area: 13.79, rects: [[10350,18500,13600,23300]], floor: 'oak', ext: { S: 'glass' }, label: [11950, 19400] },
+  { id: 'cloak', ko: '드레스룸', zh: '衣帽间', rects: [[12850,14650,14700,18500]], floor: 'oak', label: [13780, 17750] },
+  { id: 'mbath', ko: '마스터 욕실', zh: '主卫', area: 9.06, rects: [[14700,14650,18000,18500]], floor: 'tile', ext: { N: 'wall', E: 'wall' }, label: [16000, 16700] },
+  { id: 'master', ko: '마스터 침실', zh: '主卧', area: 23.97, rects: [[13600,18500,18000,23300]], floor: 'oak', ext: { E: 'glass', S: 'glass' }, corner: { c: 'BR', r: 1500 }, label: [16700, 21400] },
+];
+// Rooms that share no wall (open plan)
+const OPEN = [['corrN','living'], ['family','corrN'], ['living','foyer'], ['living','corrS']];
+// Door / opening rectangles (mm) cut out of interior walls
+const DOORS = [
+  [1100,1750,2500,1850],   // balcony ↔ guest bedroom
+  [4950,4000,5050,4900],   // guest bedroom
+  [5300,3750,6100,3850],   // bath 1
+  [7200,500,7300,1400],    // equipment ↔ kitchen
+  [8300,3750,10300,3850],  // kitchen sliding door
+  [6400,12600,6500,14400], // public lift → private lift hall
+  [9000,12300,9100,13500], // main entrance
+  [11500,15100,11600,15900], // guest bath
+  [8650,17200,8750,18000], // bath 3
+  [8800,18450,9600,18550], // bedroom 3
+  [11200,18450,12100,18550], // bedroom 2
+  [12800,17000,12900,17900], // dressing room
+  [14650,16700,14750,17500], // master bath
+  [13700,18450,14600,18550], // master bedroom
+];
+
+/* ============================================================
+   2. FURNITURE SCHEDULE  (dims cm W×D×H, pos plan mm, rot° — 0 = front faces south)
+   ============================================================ */
+const ITEMS = [];
+let _n = 0;
+function add(o) { o.id = 'f' + (++_n); ITEMS.push(o); return o; }
+
+// Living
+add({ room: 'living', type: 'sofaL', cat: '모듈 소파 (L 구성)', brand: 'Living Divani', model: 'Extra Soft', designer: 'Piero Lissoni', dims: [380, 300, 72], pos: [14800, 11800], rot: 0, c1: '#CFC7BA', c2: '#B9B0A2', fixed: true,
+  note: 'TV 벽을 정면으로 보고, 동쪽 270° 창을 오른쪽에 두는 L 구성입니다. 등받이 쪽이 다이닝과 거실을 나누는 경계가 되도록 배치했습니다. 모듈 수는 매장 견적에서 조정합니다.' });
+add({ room: 'living', type: 'coffee', cat: '커피 테이블', brand: 'Cassina', model: 'LC10-P', designer: 'Le Corbusier · P. Jeanneret · C. Perriand', dims: [120, 120, 33], pos: [14250, 12450], rot: 0, c1: '#C9CDD0', c2: '#2A2D30',
+  note: 'Extra Soft는 앉는 높이가 낮아서 낮은 유리 상판 테이블이 시각적으로 공간을 덜 막습니다.' });
+add({ room: 'living', type: 'rug', cat: '러그', brand: 'cc-tapis', model: '핸드노티드 러그 (컬렉션 선택)', designer: '', dims: [400, 300, 1], pos: [14500, 12200], rot: 0, c1: '#B5ABA0' });
+add({ room: 'living', type: 'armchair', style: 'archibald', cat: '라운지 체어', brand: 'Poltrona Frau', model: 'Archibald', designer: 'Jean-Marie Massaud', dims: [96, 90, 75], pos: [12300, 12450], rot: 90, c1: '#8A5A3B',
+  note: '소파 반대편을 닫아 대화 동선을 만드는 자리입니다. 코냑색 가죽으로 소파 패브릭과 대비를 줍니다.' });
+add({ room: 'living', type: 'arco', cat: '플로어 램프', brand: 'Flos', model: 'Arco', designer: 'Achille & Pier Giacomo Castiglioni', dims: [42, 215, 250], pos: [12500, 10500], rot: 38, c1: '#E8E5E0', c2: '#C8CCCF',
+  note: '천장 매입등 없이 커피 테이블 위로 빛을 떨어뜨립니다. 대리석 베이스는 소파 뒤쪽 모서리에 둡니다.' });
+add({ room: 'living', type: 'cabinet', cat: '미디어 수납장', brand: 'Molteni&C', model: '505 수납 시스템', designer: '', dims: [320, 50, 45], pos: [14800, 14380], rot: 180, c1: '#3E3A36', c2: '#3E3A36' });
+add({ room: 'living', type: 'tv', cat: 'TV', brand: 'Bang & Olufsen', model: 'Beovision Harmony 77"', designer: '', dims: [172, 25, 100], pos: [14800, 14450], rot: 180, elev: 0.45, c1: '#151618', c2: '#8C7A62',
+  note: '소파 정면 중심선(14.8 m)에 맞췄습니다. 시청 거리는 약 2.9 m입니다.' });
+add({ room: 'living', type: 'speaker', cat: '스피커 (L)', brand: 'Bang & Olufsen', model: 'Beolab 28', designer: '', dims: [20, 20, 125], pos: [13000, 14420], rot: 180, c1: '#2B2C2E' });
+add({ room: 'living', type: 'speaker', cat: '스피커 (R)', brand: 'Bang & Olufsen', model: 'Beolab 28', designer: '', dims: [20, 20, 125], pos: [16600, 14420], rot: 180, c1: '#2B2C2E' });
+// Dining
+add({ room: 'living', type: 'tableRound', cat: '다이닝 테이블 Ø180', brand: 'Molteni&C', model: 'Arc', designer: 'Foster + Partners', dims: [180, 180, 74], pos: [14900, 7200], rot: 0, c1: '#AEB9B6', c2: '#A39C92',
+  note: '원형 6인석은 270° 창에 막힘 없이 시선을 열어둡니다. 북·동쪽 유리에서 1 m 이상 떨어뜨렸습니다.' });
+{
+  const cx = 14900, cy = 7200, R = 1150;
+  for (let k = 0; k < 6; k++) {
+    const a = (k * 60 + 30) * Math.PI / 180;
+    const px = cx + R * Math.cos(a), py = cy + R * Math.sin(a);
+    const rot = Math.atan2(cx - px, cy - py) * 180 / Math.PI;
+    add({ room: 'living', type: 'chair', cat: `다이닝 체어 ${k + 1}/6`, brand: 'Cassina', model: 'Cab 412', designer: 'Mario Bellini', dims: [47, 52, 82], pos: [Math.round(px), Math.round(py)], rot, c1: '#2F2925' });
+  }
+}
+add({ room: 'living', type: 'pendant', cat: '다이닝 펜던트', brand: 'Bocci', model: '28 시리즈 (7구 클러스터)', designer: 'Omer Arbel', dims: [120, 120, 60], pos: [14900, 7200], rot: 0, c1: '#F4E6C8' });
+// Western kitchen
+add({ room: 'living', type: 'cabinet', cat: '서양식 주방 키큰장', brand: 'Boffi', model: 'Code (Gaggenau 오븐 · Sub-Zero 와인셀러 빌트인)', designer: '', dims: [380, 62, 240], pos: [9800, 7000], rot: 90, c1: '#2F3133', c2: '#2F3133',
+  note: '서쪽 벽(코어 쪽)을 통째로 수납벽으로 써서 거실 쪽에 잡동사니가 보이지 않게 합니다.' });
+add({ room: 'living', type: 'island', cat: '아일랜드', brand: 'Boffi', model: 'Code 아일랜드', designer: '', dims: [320, 110, 92], pos: [11700, 7000], rot: 90, c1: '#2F3133', c2: '#E6E2DB',
+  note: '키큰장과 104 cm 작업 통로를 확보했습니다. 동쪽 오버행에 카운터 체어 3개가 들어갑니다.' });
+for (const y of [6100, 7000, 7900]) add({ room: 'living', type: 'stool', cat: '카운터 체어', brand: 'Gubi', model: 'Beetle Counter Chair', designer: 'GamFratesi', dims: [56, 55, 98], pos: [12550, y], rot: -90, c1: '#3D4A3E', c2: '#B08D57' });
+
+// Family room
+add({ room: 'family', type: 'sofa', cat: '소파', brand: 'Minotti', model: 'Connery', designer: 'Rodolfo Dordoni', dims: [230, 95, 78], pos: [12100, 1900], rot: 90, c1: '#A39D88', c2: '#3A3632' });
+add({ room: 'family', type: 'noguchi', cat: '커피 테이블', brand: 'Vitra', model: 'Noguchi Coffee Table', designer: 'Isamu Noguchi', dims: [128, 93, 40], pos: [13200, 1700], rot: 90, c1: '#5A3E2B' });
+add({ room: 'family', type: 'eames', cat: '라운지 체어 + 오토만', brand: 'Vitra', model: 'Eames Lounge Chair & Ottoman', designer: 'Charles & Ray Eames', dims: [84, 140, 84], pos: [13750, 3050], rot: 165, c1: '#1E1C1B', c2: '#5B3A26' });
+
+// Chinese kitchen
+add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: '주방 하부장 (북측)', brand: 'Bulthaup', model: 'b3 · Gaggenau Vario 400 쿡탑', designer: '', dims: [320, 65, 90], pos: [9500, 450], rot: 0, c1: '#55585B', c2: '#D6D2CA' });
+add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: '주방 하부장 (동측)', brand: 'Bulthaup', model: 'b3', designer: '', dims: [220, 65, 90], pos: [10970, 2050], rot: -90, c1: '#55585B', c2: '#D6D2CA' });
+add({ room: 'kitchen', type: 'island', cat: '작업대', brand: 'Bulthaup', model: 'b3 워크 아일랜드', designer: '', dims: [180, 80, 90], pos: [9200, 2200], rot: 0, c1: '#55585B', c2: '#D6D2CA' });
+add({ room: 'kitchen', type: 'appliance', cat: '냉장고', brand: 'Sub-Zero', model: '빌트인 냉장·냉동고', designer: '', dims: [91, 61, 213], pos: [7560, 3100], rot: 90, c1: '#B9BCBE' });
+
+// Equipment room
+add({ room: 'equip', type: 'appliance', cat: '세탁·건조기', brand: 'Miele', model: 'W1 / T1 스택', designer: '', dims: [60, 65, 180], pos: [4000, 450], rot: 0, c1: '#E9E9E7' });
+add({ room: 'equip', type: 'appliance', cat: '전열교환 환기', brand: 'Zehnder', model: 'ComfoAir Q', designer: '', dims: [80, 55, 90], pos: [6600, 400], rot: 0, c1: '#F1F1EF' });
+
+// Balcony
+add({ room: 'balcony', type: 'armchair', style: 'outdoor', cat: '아웃도어 라운지 체어', brand: 'Kettal', model: 'Vieques', designer: 'Patricia Urquiola', dims: [78, 80, 72], pos: [1550, 1050], rot: 200, c1: '#E2D8C6' });
+add({ room: 'balcony', type: 'armchair', style: 'outdoor', cat: '아웃도어 라운지 체어', brand: 'Kettal', model: 'Vieques', designer: 'Patricia Urquiola', dims: [78, 80, 72], pos: [2700, 1050], rot: 160, c1: '#E2D8C6' });
+
+// Guest bedroom (north)
+add({ room: 'bed4', type: 'bed', cat: '침대 (160×200)', brand: 'Cassina', model: 'Volage EX-S', designer: 'Philippe Starck', dims: [180, 215, 100], pos: [1800, 4575], rot: 180, c1: '#D9D2C6', c2: '#4B3A2D' });
+add({ room: 'bed4', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [600, 5300], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed4', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [3000, 5300], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed4', type: 'cabinet', cat: '붙박이장', brand: 'Poliform', model: 'Senzafine', designer: '', dims: [200, 60, 240], pos: [3300, 2800], rot: -90, c1: '#5B4636', c2: '#5B4636' });
+
+// Bathrooms
+add({ room: 'bath1', type: 'vanity', cat: '세면대', brand: 'Antonio Lupi', model: '세면대 (모델 선택)', designer: '', dims: [120, 50, 85], pos: [4400, 2050], rot: 0, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath1', type: 'toilet', cat: '비데 일체형 변기', brand: 'TOTO', model: 'Neorest', designer: '', dims: [40, 70, 50], pos: [5900, 2150], rot: 0, c1: '#F6F6F4' });
+add({ room: 'bath1', type: 'shower', cat: '샤워 부스', brand: 'Dornbracht', model: '샤워 수전 (부스 맞춤 제작)', designer: '', dims: [100, 100, 200], pos: [4100, 3300], rot: 0, c1: '#C9CDD0' });
+add({ room: 'bath2', type: 'vanity', cat: '세면대', brand: 'Antonio Lupi', model: '세면대 (모델 선택)', designer: '', dims: [100, 50, 85], pos: [9300, 15200], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath2', type: 'toilet', cat: '비데 일체형 변기', brand: 'TOTO', model: 'Neorest', designer: '', dims: [40, 70, 50], pos: [9400, 16300], rot: 90, c1: '#F6F6F4' });
+add({ room: 'bath2', type: 'shower', cat: '샤워 부스', brand: 'Dornbracht', model: '샤워 수전 (부스 맞춤 제작)', designer: '', dims: [100, 100, 200], pos: [10350, 16200], rot: 0, c1: '#C9CDD0' });
+add({ room: 'bath3', type: 'vanity', cat: '세면대', brand: 'Antonio Lupi', model: '세면대 (모델 선택)', designer: '', dims: [120, 50, 85], pos: [6700, 17600], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath3', type: 'toilet', cat: '비데 일체형 변기', brand: 'TOTO', model: 'Neorest', designer: '', dims: [40, 70, 50], pos: [6800, 18800], rot: 90, c1: '#F6F6F4' });
+add({ room: 'bath3', type: 'shower', cat: '샤워 부스', brand: 'Dornbracht', model: '샤워 수전 (부스 맞춤 제작)', designer: '', dims: [120, 100, 200], pos: [7900, 19600], rot: 0, c1: '#C9CDD0' });
+
+// Private lift hall + foyer
+add({ room: 'lift', type: 'bench', cat: '벤치', brand: 'Knoll', model: 'Florence Knoll Bench', designer: 'Florence Knoll', dims: [190, 46, 38], pos: [8800, 14500], rot: -90, c1: '#242322', c2: '#C8CCCF' });
+add({ room: 'foyer', type: 'cabinet', cat: '신발장', brand: 'Molteni&C', model: 'Gliss Master', designer: '', dims: [220, 45, 220], pos: [10300, 14420], rot: 180, c1: '#6A5A4A', c2: '#6A5A4A',
+  note: '현관 문을 열었을 때 정면이 아니라 측면에 오도록 남쪽 벽에 붙였습니다. 들어서면 거실 창이 먼저 보입니다.' });
+
+// Bedroom 3 (19.89㎡)
+add({ room: 'bed3', type: 'bed', cat: '침대 (180×200)', brand: 'Poliform', model: 'Dream', designer: 'Rodolfo Dordoni', dims: [200, 225, 105], pos: [7575, 22800], rot: 90, c1: '#BDB7AF', c2: '#8F887F' });
+add({ room: 'bed3', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [6700, 21500], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed3', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [6700, 24100], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed3', type: 'desk', cat: '책상', brand: 'USM', model: 'Haller Table', designer: 'Fritz Haller', dims: [175, 75, 74], pos: [8700, 25050], rot: 180, c1: '#F2F1EE', c2: '#C8CCCF',
+  note: '남쪽 곡면 유리를 바라보는 책상입니다. 낮에 모니터에 역광이 생기면 동쪽 벽 쪽으로 90° 돌리면 됩니다.' });
+add({ room: 'bed3', type: 'officeChair', cat: '책상 의자', brand: 'Vitra', model: 'Aluminium Chair EA 117', designer: 'Charles & Ray Eames', dims: [58, 58, 90], pos: [8700, 24350], rot: 0, c1: '#2A2826', c2: '#C8CCCF' });
+add({ room: 'bed3', type: 'armchair', style: 'egg', cat: '라운지 체어', brand: 'Fritz Hansen', model: 'Egg Chair', designer: 'Arne Jacobsen', dims: [86, 95, 107], pos: [9700, 22200], rot: -110, c1: '#6E3B2A', c2: '#C8CCCF' });
+add({ room: 'bed3', type: 'cabinet', cat: '붙박이장', brand: 'Poliform', model: 'Senzafine', designer: '', dims: [150, 60, 240], pos: [10050, 19525], rot: -90, c1: '#5B4636', c2: '#5B4636' });
+
+// Bedroom 2 (13.79㎡)
+add({ room: 'bed2', type: 'bed', cat: '침대 (160×200)', brand: 'B&B Italia', model: 'Husk Bed', designer: 'Patricia Urquiola', dims: [190, 225, 100], pos: [12475, 21400], rot: -90, c1: '#CFC8BC', c2: '#8E8478' });
+add({ room: 'bed2', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13370, 20180], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed2', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13370, 22620], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'bed2', type: 'cabinet', cat: '붙박이장', brand: 'Poliform', model: 'Senzafine', designer: '', dims: [200, 60, 240], pos: [10650, 19900], rot: 90, c1: '#5B4636', c2: '#5B4636' });
+
+// Dressing room
+add({ room: 'cloak', type: 'cabinet', style: 'open', cat: '워크인 수납 (서측)', brand: 'Poliform', model: 'Senzafine 워크인', designer: '', dims: [220, 60, 240], pos: [13150, 15800], rot: 90, c1: '#4A3B30', c2: '#9A8A78' });
+add({ room: 'cloak', type: 'cabinet', style: 'open', cat: '워크인 수납 (동측)', brand: 'Poliform', model: 'Senzafine 워크인', designer: '', dims: [160, 60, 240], pos: [14400, 15600], rot: -90, c1: '#4A3B30', c2: '#9A8A78' });
+
+// Master bath
+add({ room: 'mbath', type: 'tub', cat: '독립 욕조', brand: 'Agape', model: 'Spoon XL', designer: 'Benedini Associati', dims: [185, 85, 52], pos: [17400, 16700], rot: 90, c1: '#F4F3F0',
+  note: '동쪽 창 쪽에 길게 두어 욕조에서 바깥을 보게 했습니다.' });
+add({ room: 'mbath', type: 'vanity', cat: '더블 세면대', brand: 'Antonio Lupi', model: '더블 세면대 (모델 선택)', designer: '', dims: [200, 55, 85], pos: [15900, 18200], rot: 180, c1: '#EDEBE7', c2: '#6D6258', double: true });
+add({ room: 'mbath', type: 'toilet', cat: '비데 일체형 변기', brand: 'TOTO', model: 'Neorest', designer: '', dims: [40, 70, 50], pos: [16700, 15000], rot: 0, c1: '#F6F6F4' });
+add({ room: 'mbath', type: 'shower', cat: '샤워 부스', brand: 'Dornbracht', model: '레인 샤워 (부스 맞춤 제작)', designer: '', dims: [120, 120, 200], pos: [15400, 15400], rot: 0, c1: '#C9CDD0' });
+
+// Master bedroom
+add({ room: 'master', type: 'rug', cat: '러그', brand: 'cc-tapis', model: '핸드노티드 러그 (컬렉션 선택)', designer: '', dims: [300, 350, 1], pos: [15100, 21000], rot: 0, c1: '#9C9188' });
+add({ room: 'master', type: 'bed', style: 'tall', cat: '침대 (210×210)', brand: 'Hästens', model: 'Vividus', designer: 'Ferris Rafauli', dims: [215, 230, 120], pos: [14750, 21000], rot: 90, c1: '#EEECE8', c2: '#2F4A6E',
+  note: '머리를 서쪽 벽에 두고 발끝이 동·남쪽 곡면 유리를 향합니다. 아침 햇빛이 얼굴로 바로 들지 않는 방향입니다.' });
+add({ room: 'master', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13850, 19650], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'master', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13850, 22350], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+add({ room: 'master', type: 'armchair', style: 'husk', cat: '라운지 체어', brand: 'B&B Italia', model: 'Husk Armchair', designer: 'Patricia Urquiola', dims: [83, 86, 92], pos: [17050, 19450], rot: -135, c1: '#6B6560', c2: '#3A3734' });
+
+/* ============================================================
+   3. RENDERER / SCENE
+   ============================================================ */
+const stage = document.getElementById('stage');
+const css2dHost = document.getElementById('css2d');
+const MM = 0.001;
+const CX = 9.0, CZ = 12.8;  // plan centre (m)
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.insertBefore(renderer.domElement, css2dHost);
+
+const labelRenderer = new CSS2DRenderer({ element: css2dHost });
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 400);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.maxPolarAngle = Math.PI / 2 - 0.04;
+controls.minDistance = 1.5;
+controls.maxDistance = 80;
+controls.target.set(CX, 0, CZ);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xcfc8bc, 0.45));
+const sun = new THREE.DirectionalLight(0xfff4e6, 2.0);
+sun.position.set(CX + 9, 26, CZ - 6);
+sun.target.position.set(CX, 0, CZ);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -17, right: 17, top: 17, bottom: -17, near: 1, far: 70 });
+sun.shadow.bias = -0.0004;
+sun.shadow.normalBias = 0.02;
+scene.add(sun, sun.target);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 1 }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.set(CX, -0.02, CZ);
+ground.receiveShadow = true;
+scene.add(ground);
+
+function applyTheme() {
+  const css = getComputedStyle(document.documentElement);
+  const stageC = new THREE.Color(css.getPropertyValue('--stage').trim() || '#E6E7E3');
+  scene.background = stageC;
+  const g = stageC.clone(); g.offsetHSL(0, 0, -0.035);
+  ground.material.color.copy(g);
+}
+applyTheme();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+/* ---------- materials ---------- */
+const matCache = new Map();
+function M(color, rough = 0.7, metal = 0, extra = {}) {
+  const key = color + '|' + rough + '|' + metal + '|' + JSON.stringify(extra);
+  if (!matCache.has(key)) matCache.set(key, new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal, ...extra }));
+  return matCache.get(key);
+}
+const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xa9c6d3, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
+const chrome = () => M('#C8CCCF', 0.22, 0.95);
+const darkMetal = () => M('#2A2C2E', 0.4, 0.6);
+
+/* ---------- procedural floor textures ---------- */
+function canvasTex(size, draw, repeatM) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  draw(c.getContext('2d'), size);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  t.repeat.set(1 / repeatM, 1 / repeatM);
+  return t;
+}
+function rnd(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+const oakTex = canvasTex(1024, (g, s) => {
+  const r = rnd(7), tones = ['#C7A479', '#C19C70', '#CDAB82', '#BC966A', '#C9A57C'];
+  const pw = s / 6;
+  for (let p = 0; p < 6; p++) {
+    let y = -r() * s * 0.5;
+    while (y < s) {
+      const len = s * (0.45 + r() * 0.5);
+      g.fillStyle = tones[Math.floor(r() * tones.length)];
+      g.fillRect(p * pw, y, pw, len);
+      for (let k = 0; k < 26; k++) {
+        g.strokeStyle = `rgba(90,60,30,${0.04 + r() * 0.06})`; g.lineWidth = 0.6 + r() * 1.2;
+        const x0 = p * pw + r() * pw; g.beginPath(); g.moveTo(x0, y);
+        g.bezierCurveTo(x0 + (r() - 0.5) * 10, y + len * 0.3, x0 + (r() - 0.5) * 10, y + len * 0.7, x0 + (r() - 0.5) * 6, y + len); g.stroke();
+      }
+      g.fillStyle = 'rgba(60,40,20,0.35)'; g.fillRect(p * pw, y, pw, 1.5);
+      y += len;
+    }
+    g.fillStyle = 'rgba(60,40,20,0.28)'; g.fillRect(p * pw, 0, 1.5, s);
+  }
+}, 1.2);
+const marbleTex = canvasTex(1024, (g, s) => {
+  const r = rnd(42);
+  g.fillStyle = '#ECEAE5'; g.fillRect(0, 0, s, s);
+  for (let k = 0; k < 40; k++) {
+    const x = r() * s, y = r() * s, rad = 60 + r() * 220;
+    const gr = g.createRadialGradient(x, y, 0, x, y, rad);
+    gr.addColorStop(0, `rgba(170,160,150,${0.05 + r() * 0.05})`); gr.addColorStop(1, 'rgba(170,160,150,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, s, s);
+  }
+  for (let k = 0; k < 14; k++) {
+    g.strokeStyle = `rgba(128,120,112,${0.12 + r() * 0.2})`; g.lineWidth = 0.6 + r() * 2.2;
+    g.beginPath(); let x = r() * s, y = -20; g.moveTo(x, y);
+    while (y < s + 20) { const nx = x + (r() - 0.45) * 140, ny = y + 60 + r() * 90; g.quadraticCurveTo(x + (r() - 0.5) * 80, (y + ny) / 2, nx, ny); x = nx; y = ny; }
+    g.stroke();
+  }
+  g.strokeStyle = 'rgba(0,0,0,0.10)'; g.lineWidth = 2; g.strokeRect(0, 0, s, s);
+}, 1.2);
+const tileTex = canvasTex(512, (g, s) => {
+  const r = rnd(3);
+  g.fillStyle = '#D8D7D2'; g.fillRect(0, 0, s, s);
+  for (let k = 0; k < 2500; k++) { g.fillStyle = `rgba(120,118,112,${r() * 0.08})`; g.fillRect(r() * s, r() * s, 2, 2); }
+  g.strokeStyle = 'rgba(80,80,80,0.25)'; g.lineWidth = 3; g.strokeRect(0, 0, s, s);
+}, 0.6);
+const stoneDarkTex = canvasTex(512, (g, s) => {
+  const r = rnd(11);
+  g.fillStyle = '#76716B'; g.fillRect(0, 0, s, s);
+  for (let k = 0; k < 3000; k++) { g.fillStyle = `rgba(${r() > 0.5 ? '255,255,255' : '0,0,0'},${r() * 0.06})`; g.fillRect(r() * s, r() * s, 2, 2); }
+  g.strokeStyle = 'rgba(30,30,30,0.35)'; g.lineWidth = 3; g.strokeRect(0, 0, s, s);
+}, 0.6);
+const FLOOR = {
+  oak: new THREE.MeshStandardMaterial({ map: oakTex, roughness: 0.62, side: THREE.DoubleSide }),
+  marble: new THREE.MeshStandardMaterial({ map: marbleTex, roughness: 0.22, side: THREE.DoubleSide }),
+  tile: new THREE.MeshStandardMaterial({ map: tileTex, roughness: 0.5, side: THREE.DoubleSide }),
+  stoneDark: new THREE.MeshStandardMaterial({ map: stoneDarkTex, roughness: 0.55, side: THREE.DoubleSide }),
+  core: new THREE.MeshStandardMaterial({ color: '#B4B6B6', roughness: 0.9, side: THREE.DoubleSide }),
+};
+
+/* ============================================================
+   4. ARCHITECTURE: floors, walls (raster-derived), glass façade
+   ============================================================ */
+const roomIdx = new Map(ROOMS.map((r, i) => [r.id, i + 1]));
+const G = 50, NX = 18000 / G, NY = 25600 / G;
+const grid = new Int16Array(NX * NY);
+ROOMS.forEach((room, i) => {
+  for (const [x0, y0, x1, y1] of room.rects)
+    for (let j = y0 / G; j < y1 / G; j++) for (let k = x0 / G; k < x1 / G; k++) grid[j * NX + k] = i + 1;
+});
+const idAt = (i, j) => (i < 0 || j < 0 || i >= NX || j >= NY) ? 0 : grid[j * NX + i];
+const openSet = new Set(OPEN.flatMap(([a, b]) => [roomIdx.get(a) + '|' + roomIdx.get(b), roomIdx.get(b) + '|' + roomIdx.get(a)]));
+const inDoor = (x, y) => DOORS.some(d => x > d[0] && x < d[2] && y > d[1] && y < d[3]);
+
+function cornerInfo(room) {
+  if (!room.corner) return null;
+  const [x0, y0, x1, y1] = room.rects[0];
+  const { c, r } = room.corner;
+  const cx = c.includes('L') ? x0 + r : x1 - r;
+  const cy = c.includes('T') ? y0 + r : y1 - r;
+  const a0 = { TL: Math.PI, TR: 1.5 * Math.PI, BR: 0, BL: 0.5 * Math.PI }[c];
+  const side = c.includes('L') ? 'W' : 'E';
+  return { c, r, cx, cy, a0, side, x0, y0, x1, y1 };
+}
+function inCorner(room, x, y) {
+  const ci = cornerInfo(room); if (!ci) return false;
+  const inX = ci.c.includes('L') ? x <= ci.x0 + ci.r : x >= ci.x1 - ci.r;
+  const inY = ci.c.includes('T') ? y <= ci.y0 + ci.r : y >= ci.y1 - ci.r;
+  return inX && inY && x >= ci.x0 - 1 && x <= ci.x1 + 1 && y >= ci.y0 - 1 && y <= ci.y1 + 1;
+}
+
+// Edge classification → 'int' | 'wall' | 'glass' | 'rail' | null
+function classify(a, b, side, mx, my) {
+  if (a === b) return null;
+  const ra = ROOMS[a - 1], rb = ROOMS[b - 1];
+  if ((ra && ra.solid) || (rb && rb.solid)) return null;
+  if (a && b) {
+    if (openSet.has(a + '|' + b)) return null;
+    if (inDoor(mx, my)) return null;
+    return 'int';
+  }
+  const room = a ? ra : rb;
+  const s = a ? side[0] : side[1];
+  if (inCorner(room, mx, my)) return null;
+  return (room.ext && room.ext[s]) || 'wall';
+}
+const SEGS = [];
+function pushRun(run) { if (run && run.kind) SEGS.push(run); }
+for (let i = -1; i < NX; i++) {           // vertical edges at x = (i+1)·G
+  const x = (i + 1) * G; let run = null;
+  for (let j = 0; j < NY; j++) {
+    const kind = classify(idAt(i, j), idAt(i + 1, j), ['E', 'W'], x, (j + 0.5) * G);
+    if (run && kind === run.kind) { run.y1 = (j + 1) * G; continue; }
+    pushRun(run); run = kind ? { kind, x0: x, y0: j * G, x1: x, y1: (j + 1) * G } : null;
+  }
+  pushRun(run);
+}
+for (let j = -1; j < NY; j++) {           // horizontal edges at y = (j+1)·G
+  const y = (j + 1) * G; let run = null;
+  for (let i = 0; i < NX; i++) {
+    const kind = classify(idAt(i, j), idAt(i, j + 1), ['S', 'N'], (i + 0.5) * G, y);
+    if (run && kind === run.kind) { run.x1 = (i + 1) * G; continue; }
+    pushRun(run); run = kind ? { kind, x0: i * G, y0: y, x1: (i + 1) * G, y1: y } : null;
+  }
+  pushRun(run);
+}
+// curved façade corners
+for (const room of ROOMS) {
+  const ci = cornerInfo(room); if (!ci) continue;
+  const kind = (room.ext && room.ext[ci.side]) || 'wall';
+  const N = 10;
+  for (let k = 0; k < N; k++) {
+    const t0 = ci.a0 + (k / N) * Math.PI / 2, t1 = ci.a0 + ((k + 1) / N) * Math.PI / 2;
+    SEGS.push({ kind, arc: true, x0: ci.cx + ci.r * Math.cos(t0), y0: ci.cy + ci.r * Math.sin(t0), x1: ci.cx + ci.r * Math.cos(t1), y1: ci.cy + ci.r * Math.sin(t1) });
+  }
+}
+
+const archGroup = new THREE.Group(); scene.add(archGroup);
+const wallGroup = new THREE.Group(); scene.add(wallGroup);
+
+// Floors
+function roomShape(rect, ci) {
+  const [x0, y0, x1, y1] = rect.map(v => v * MM);
+  const s = new THREE.Shape();
+  const r = ci ? ci.r * MM : 0, c = ci ? ci.c : '';
+  // shape in (x, -y) so that rotateX(-90°) maps to (x, 0, y)
+  s.moveTo(x0, -y0);
+  if (c === 'TR') { s.lineTo(x1 - r, -y0); s.quadraticCurveTo(x1, -y0, x1, -(y0 + r)); } else s.lineTo(x1, -y0);
+  if (c === 'BR') { s.lineTo(x1, -(y1 - r)); s.quadraticCurveTo(x1, -y1, x1 - r, -y1); } else s.lineTo(x1, -y1);
+  if (c === 'BL') { s.lineTo(x0 + r, -y1); s.quadraticCurveTo(x0, -y1, x0, -(y1 - r)); } else s.lineTo(x0, -y1);
+  if (c === 'TL') { s.lineTo(x0, -(y0 + r)); s.quadraticCurveTo(x0, -y0, x0 + r, -y0); }
+  s.closePath();
+  return s;
+}
+for (const room of ROOMS) {
+  if (room.solid) continue;
+  room.rects.forEach((rect, k) => {
+    const geo = new THREE.ShapeGeometry(roomShape(rect, k === 0 ? cornerInfo(room) : null), 24);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, FLOOR[room.floor]);
+    mesh.position.y = 0.004 + k * 0.0005;
+    mesh.receiveShadow = true;
+    archGroup.add(mesh);
+  });
+}
+
+// Core details: stair flights + lift shafts (schematic)
+function coreDetails(h) {
+  const g = new THREE.Group();
+  const step = M('#C9CACA', 0.85);
+  for (const [y0, y1, dir] of [[6050, 7150, 1], [7350, 8450, -1]]) {
+    for (let k = 0; k < 13; k++) {
+      const hh = Math.min(h, 1.6) * (k + 1) / 13;
+      const x = dir > 0 ? 1600 + k * 480 : 7840 - k * 480;
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.48, hh, (y1 - y0) * MM), step);
+      m.position.set(x * MM, hh / 2, (y0 + y1) / 2 * MM); m.castShadow = m.receiveShadow = true; g.add(m);
+    }
+  }
+  for (const [y0, y1] of [[11800, 14200], [14350, 16700]]) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(2.6, h, (y1 - y0) * MM), M('#7C8186', 0.6, 0.2));
+    m.position.set(4.95, h / 2, (y0 + y1) / 2 * MM); m.castShadow = true; g.add(m);
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.02, Math.min(h, 2.2), 1.1), chrome());
+    door.position.set(6.26, Math.min(h, 2.2) / 2, (y0 + y1) / 2 * MM); g.add(door);
+  }
+  return g;
+}
+
+function segBox(seg, w, h, t, y0, mat, cast = true) {
+  const x0 = seg.x0 * MM, z0 = seg.y0 * MM, x1 = seg.x1 * MM, z1 = seg.y1 * MM;
+  const L = Math.hypot(x1 - x0, z1 - z0) + (seg.kind === 'int' || seg.kind === 'wall' ? t * 0.999 : 0.005);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(L, h, t), mat);
+  m.position.set((x0 + x1) / 2, y0 + h / 2, (z0 + z1) / 2);
+  m.rotation.y = -Math.atan2(z1 - z0, x1 - x0);
+  m.castShadow = cast; m.receiveShadow = true;
+  return m;
+}
+const wallMatInt = M('#F3F2EF', 0.92);
+const wallMatExt = M('#E7E5E0', 0.9);
+const solidMat = M('#D3D1CC', 0.9);
+
+function buildWalls(full) {
+  wallGroup.clear();
+  const H = full ? 3.0 : 1.15;
+  for (const s of SEGS) {
+    if (s.kind === 'int') wallGroup.add(segBox(s, 0, H, 0.12, 0, wallMatInt));
+    else if (s.kind === 'wall') wallGroup.add(segBox(s, 0, H, 0.24, 0, wallMatExt));
+    else {
+      const rail = s.kind === 'rail';
+      const gh = rail ? Math.min(1.05, H) : H;
+      const pane = segBox(s, 0, gh - 0.05, 0.025, 0.05, glassMat, false); wallGroup.add(pane);
+      wallGroup.add(segBox(s, 0, 0.05, 0.07, 0, darkMetal(), false));
+      wallGroup.add(segBox(s, 0, 0.045, 0.06, gh - 0.045, darkMetal(), false));
+      if (!s.arc) {
+        const L = Math.hypot(s.x1 - s.x0, s.y1 - s.y0) * MM;
+        const n = Math.max(1, Math.round(L / 1.5));
+        for (let k = 0; k <= n; k++) {
+          const t = k / n;
+          const mx = (s.x0 + (s.x1 - s.x0) * t), my = (s.y0 + (s.y1 - s.y0) * t);
+          const m = new THREE.Mesh(new THREE.BoxGeometry(0.045, gh, 0.06), darkMetal());
+          m.position.set(mx * MM, gh / 2, my * MM); wallGroup.add(m);
+        }
+      }
+    }
+  }
+  // solid columns / shafts
+  for (const room of ROOMS) if (room.solid) for (const [x0, y0, x1, y1] of room.rects) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry((x1 - x0) * MM, H, (y1 - y0) * MM), solidMat);
+    m.position.set((x0 + x1) / 2 * MM, H / 2, (y0 + y1) / 2 * MM); m.castShadow = m.receiveShadow = true; wallGroup.add(m);
+  }
+  // lintels over doors when walls are full height
+  if (full) for (const [x0, y0, x1, y1] of DOORS) {
+    const horiz = (x1 - x0) > (y1 - y0);
+    const seg = horiz ? { kind: 'lintel', x0, y0: (y0 + y1) / 2, x1, y1: (y0 + y1) / 2 } : { kind: 'lintel', x0: (x0 + x1) / 2, y0, x1: (x0 + x1) / 2, y1 };
+    wallGroup.add(segBox(seg, 0, H - 2.25, 0.12, 2.25, wallMatInt));
+  }
+  wallGroup.add(coreDetails(H));
+}
+
+/* ============================================================
+   5. FURNITURE BUILDERS  (local: width → x, depth → z, front = +z; meters)
+   ============================================================ */
+function bx(g, w, h, d, x, y, z, mat, r = 0, cast = true) {
+  const geo = r > 0 ? new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2, h / 2, d / 2) * 0.98) : new THREE.BoxGeometry(w, h, d);
+  const m = new THREE.Mesh(geo, mat);
+  m.position.set(x, y + h / 2, z); m.castShadow = cast; m.receiveShadow = true; g.add(m); return m;
+}
+function cyl(g, rt, rb, h, x, y, z, mat, seg = 28) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), mat);
+  m.position.set(x, y + h / 2, z); m.castShadow = true; m.receiveShadow = true; g.add(m); return m;
+}
+const B = {
+  sofaL(g, w, d, h, it) {
+    const fab = M(it.c1, 0.95), base = M(it.c2, 0.95), D = 1.05;
+    const z0 = -d / 2;
+    bx(g, w, 0.2, D, 0, 0, z0 + D / 2, base, 0.03);
+    for (let k = 0; k < 3; k++) {
+      const cw = w / 3 - 0.02, x = -w / 2 + w / 6 + k * w / 3;
+      bx(g, cw, 0.17, D - 0.3, x, 0.2, z0 + 0.28 + (D - 0.3) / 2, fab, 0.07);
+      bx(g, cw, 0.34, 0.26, x, 0.2, z0 + 0.14, fab, 0.1);
+    }
+    const Lc = d - D;
+    bx(g, D, 0.2, Lc, w / 2 - D / 2, 0, z0 + D + Lc / 2, base, 0.03);
+    bx(g, D - 0.02, 0.17, Lc - 0.02, w / 2 - D / 2, 0.2, z0 + D + Lc / 2, fab, 0.07);
+    bx(g, 0.5, 0.42, 0.16, -w / 2 + 0.45, 0.33, z0 + 0.38, M('#8F8577', 0.95), 0.07);
+    bx(g, 0.45, 0.4, 0.15, -w / 2 + 0.95, 0.33, z0 + 0.4, M('#E4DED3', 0.95), 0.07);
+  },
+  sofa(g, w, d, h, it) {
+    const fab = M(it.c1, 0.95);
+    bx(g, w - 0.08, 0.08, d - 0.08, 0, 0, 0, M(it.c2, 0.6));
+    bx(g, w, 0.3, d, 0, 0.08, 0, fab, 0.03);
+    for (const s of [-1, 1]) bx(g, (w - 0.3) / 2 - 0.01, 0.14, d - 0.3, s * (w - 0.3) / 4, 0.38, 0.1, fab, 0.05);
+    bx(g, w, h - 0.38, 0.22, 0, 0.38, -d / 2 + 0.11, fab, 0.06);
+    for (const s of [-1, 1]) bx(g, 0.15, 0.24, d, s * (w / 2 - 0.075), 0.38, 0, fab, 0.05);
+  },
+  armchair(g, w, d, h, it) {
+    const c = M(it.c1, it.style === 'archibald' ? 0.55 : 0.92);
+    if (it.style === 'egg') {
+      const met = chrome();
+      cyl(g, 0.3, 0.3, 0.02, 0, 0, 0, met); cyl(g, 0.03, 0.03, 0.33, 0, 0.02, 0, met);
+      bx(g, w * 0.78, 0.16, d * 0.7, 0, 0.33, 0.06, c, 0.07);
+      bx(g, w, h - 0.33, 0.2, 0, 0.33, -d / 2 + 0.14, c, 0.09);
+      for (const s of [-1, 1]) bx(g, 0.14, 0.42, d * 0.62, s * (w / 2 - 0.07), 0.45, -0.04, c, 0.07);
+      return;
+    }
+    if (it.style === 'husk') {
+      for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl(g, 0.012, 0.012, 0.22, sx * (w / 2 - 0.1), 0, sz * (d / 2 - 0.1), M(it.c2, 0.5, 0.4));
+      bx(g, w, 0.18, d, 0, 0.22, 0, M(it.c2, 0.5), 0.08);
+      bx(g, w - 0.16, 0.13, d - 0.22, 0, 0.38, 0.06, c, 0.06);
+      bx(g, w - 0.08, h - 0.38, 0.18, 0, 0.38, -d / 2 + 0.13, c, 0.08);
+      for (const s of [-1, 1]) bx(g, 0.1, 0.2, d - 0.1, s * (w / 2 - 0.06), 0.38, 0, c, 0.05);
+      return;
+    }
+    bx(g, w, 0.42, d, 0, 0, 0, c, 0.07);
+    bx(g, w - 0.04, 0.42, 0.2, 0, 0.36, -d / 2 + 0.1, c, 0.08);
+    for (const s of [-1, 1]) bx(g, 0.18, 0.2, d - 0.06, s * (w / 2 - 0.09), 0.36, 0.01, c, 0.08);
+  },
+  eames(g, w, d, h, it) {
+    const lea = M(it.c1, 0.5), wood = M(it.c2, 0.55), met = darkMetal();
+    const cz = -d / 2 + 0.43;
+    cyl(g, 0.3, 0.3, 0.02, 0, 0, cz, met); cyl(g, 0.03, 0.03, 0.28, 0, 0.02, cz, met);
+    bx(g, 0.8, 0.06, 0.62, 0, 0.3, cz, wood, 0.03);
+    bx(g, 0.76, 0.12, 0.56, 0, 0.36, cz + 0.02, lea, 0.05);
+    const back = bx(g, 0.78, 0.6, 0.14, 0, 0.42, cz - 0.3, lea, 0.06); back.rotation.x = -0.28;
+    for (const s of [-1, 1]) bx(g, 0.1, 0.06, 0.5, s * 0.36, 0.56, cz, wood, 0.02);
+    const oz = d / 2 - 0.26;
+    cyl(g, 0.22, 0.22, 0.02, 0, 0, oz, met); cyl(g, 0.025, 0.025, 0.24, 0, 0.02, oz, met);
+    bx(g, 0.6, 0.12, 0.48, 0, 0.26, oz, lea, 0.05);
+  },
+  tableRound(g, w, d, h, it) {
+    cyl(g, 0.28, 0.42, h - 0.03, 0, 0, 0, M(it.c2, 0.85), 48);
+    const top = cyl(g, w / 2, w / 2, 0.025, 0, h - 0.025, 0, new THREE.MeshPhysicalMaterial({ color: it.c1, roughness: 0.08, transparent: true, opacity: 0.55 }), 64);
+    top.castShadow = false;
+  },
+  coffee(g, w, d, h, it) {
+    const met = chrome();
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) bx(g, 0.03, h - 0.02, 0.03, sx * (w / 2 - 0.02), 0, sz * (d / 2 - 0.02), met);
+    for (const s of [-1, 1]) { bx(g, w, 0.03, 0.03, 0, h - 0.05, s * (d / 2 - 0.02), met); bx(g, 0.03, 0.03, d, s * (w / 2 - 0.02), h - 0.05, 0, met); }
+    bx(g, w, 0.015, d, 0, h - 0.02, 0, new THREE.MeshPhysicalMaterial({ color: '#B9C4C2', roughness: 0.05, transparent: true, opacity: 0.45 }), 0, false);
+  },
+  noguchi(g, w, d, h, it) {
+    const wood = M(it.c1, 0.5);
+    const a = bx(g, w * 0.62, h - 0.02, 0.07, -0.08, 0, 0, wood, 0.03); a.rotation.y = 0.5;
+    const b = bx(g, w * 0.55, h - 0.02, 0.07, 0.12, 0, 0.02, wood, 0.03); b.rotation.y = -0.6;
+    const top = cyl(g, 1, 1, 0.019, 0, h - 0.02, 0, new THREE.MeshPhysicalMaterial({ color: '#BFD0CC', roughness: 0.05, transparent: true, opacity: 0.45 }), 48);
+    top.scale.set(w / 2, 1, d / 2); top.castShadow = false;
+  },
+  side(g, w, d, h, it) {
+    const wire = M(it.c2, 0.3, 0.9, { wireframe: true });
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(w / 2 - 0.03, w / 2 - 0.02, h - 0.02, 20, 6, true), wire);
+    base.position.y = (h - 0.02) / 2; g.add(base);
+    cyl(g, w / 2, w / 2, 0.02, 0, h - 0.02, 0, M(it.c1, 0.3));
+  },
+  chair(g, w, d, h, it) {
+    const c = M(it.c1, 0.5);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) bx(g, 0.025, 0.44, 0.025, sx * (w / 2 - 0.03), 0, sz * (d / 2 - 0.04), c);
+    bx(g, w, 0.05, d - 0.06, 0, 0.44, 0.02, c, 0.015);
+    bx(g, w - 0.02, h - 0.48, 0.03, 0, 0.48, -d / 2 + 0.04, c, 0.012);
+  },
+  stool(g, w, d, h, it) {
+    const brass = M(it.c2, 0.3, 0.9);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl(g, 0.012, 0.012, 0.66, sx * (w / 2 - 0.08), 0, sz * (d / 2 - 0.08), brass, 10);
+    bx(g, w, 0.08, d * 0.82, 0, 0.66, 0.02, M(it.c1, 0.95), 0.035);
+    bx(g, w * 0.9, h - 0.72, 0.07, 0, 0.72, -d / 2 + 0.07, M(it.c1, 0.95), 0.03);
+  },
+  bed(g, w, d, h, it) {
+    const frame = M(it.c2, 0.75), linen = M(it.c1, 0.95), white = M('#F5F4F1', 0.95);
+    const hb = it.style === 'tall' ? 0.14 : 0.1;
+    bx(g, w, 0.3, d - hb, 0, 0, hb / 2, frame, 0.03);
+    bx(g, w - 0.1, 0.24, d - hb - 0.1, 0, 0.3, hb / 2, white, 0.05);
+    bx(g, w - 0.06, 0.07, (d - hb) * 0.6, 0, 0.53, d / 2 - (d - hb) * 0.3 - 0.03, linen, 0.03);
+    bx(g, w, h, hb, 0, 0, -d / 2 + hb / 2, frame, 0.03);
+    const n = w > 2 ? 3 : 2;
+    for (let k = 0; k < n; k++) bx(g, (w - 0.3) / n, 0.14, 0.42, -w / 2 + 0.15 + (w - 0.3) / n * (k + 0.5), 0.53, -d / 2 + hb + 0.28, white, 0.06);
+  },
+  cabinet(g, w, d, h, it) {
+    const c = M(it.c1, 0.55);
+    if (it.style === 'open') {
+      bx(g, w, h, 0.03, 0, 0, -d / 2 + 0.015, c);
+      for (const s of [-1, 1]) bx(g, 0.03, h, d, s * (w / 2 - 0.015), 0, 0, c);
+      bx(g, w, 0.03, d, 0, h - 0.03, 0, c);
+      bx(g, w, 0.25, d, 0, 0, 0, c);
+      bx(g, w - 0.06, 0.02, d - 0.05, 0, 1.75, 0, M(it.c2, 0.4));
+      bx(g, w - 0.06, 0.012, 0.012, 0, 1.6, 0, chrome());
+      for (let k = 0; k < Math.floor(w / 0.18); k++) bx(g, 0.05, 0.8, d * 0.75, -w / 2 + 0.12 + k * 0.18, 0.8, 0, M(['#3C4652', '#D9D3C7', '#6E5E50', '#22252A'][k % 4], 0.95));
+      return;
+    }
+    bx(g, w, h, d, 0, 0, 0, c, 0.008);
+    if (it.style === 'counter') bx(g, w + 0.02, 0.03, d + 0.02, 0, h - 0.03, 0, M(it.c2, 0.35));
+    const n = Math.max(1, Math.round(w / 0.6));
+    const seam = M('#000000', 0.9, 0, { transparent: true, opacity: 0.35 });
+    for (let k = 1; k < n; k++) bx(g, 0.004, h - 0.06, 0.004, -w / 2 + k * w / n, 0.03, d / 2 + 0.002, seam, 0, false);
+  },
+  island(g, w, d, h, it) {
+    bx(g, w - 0.04, h - 0.04, d - 0.32, 0, 0, -0.15, M(it.c1, 0.55), 0.008);
+    bx(g, w, 0.04, d, 0, h - 0.04, 0, M(it.c2, 0.3), 0.005);
+  },
+  tv(g, w, d, h, it) {
+    const e = it.elev || 0;
+    bx(g, w, h * 0.62, 0.035, 0, e + 0.1, 0, M(it.c1, 0.15, 0.3));
+    bx(g, w * 0.98, 0.1, 0.06, 0, e, 0.01, M(it.c2, 0.6, 0.3));
+  },
+  speaker(g, w, d, h, it) {
+    cyl(g, w / 2 * 0.6, w / 2, h, 0, 0, 0, M(it.c1, 0.35, 0.7));
+    cyl(g, w / 2 * 0.9, w / 2 * 0.6, 0.06, 0, h, 0, M('#888B8E', 0.3, 0.8));
+  },
+  rug(g, w, d, h, it) { const m = bx(g, w, 0.012, d, 0, 0.006, 0, M(it.c1, 1), 0, false); m.castShadow = false; },
+  arco(g, w, d, h, it) {
+    bx(g, 0.42, 0.3, 0.26, 0, 0, 0, M(it.c1, 0.25), 0.02);
+    const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.3, 0), new THREE.Vector3(0, 1.4, 0.15), new THREE.Vector3(0, 2.2, 0.8), new THREE.Vector3(0, 2.35, 1.5), new THREE.Vector3(0, 2.1, 2.05)]);
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.012, 8), chrome()); tube.castShadow = true; g.add(tube);
+    const shade = new THREE.Mesh(new THREE.SphereGeometry(0.2, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2), M(it.c2, 0.2, 0.95, { side: THREE.DoubleSide }));
+    shade.position.set(0, 2.0, 2.1); shade.castShadow = true; g.add(shade);
+    const bulb = new THREE.Mesh(new THREE.CircleGeometry(0.17, 24), M('#FFF2D6', 1, 0, { emissive: '#FFE7B8', emissiveIntensity: 1.4 }));
+    bulb.rotation.x = Math.PI / 2; bulb.position.set(0, 1.99, 2.1); g.add(bulb);
+  },
+  pendant(g, w, d, h, it) {
+    const glow = M('#FFF6E6', 0.1, 0, { emissive: it.c1, emissiveIntensity: 1.6 });
+    const glass = new THREE.MeshPhysicalMaterial({ color: '#E8EEF0', roughness: 0.05, transparent: true, opacity: 0.35 });
+    const pts = [[0, 0, 2.05], [0.32, 0.1, 2.2], [-0.3, 0.18, 2.12], [0.12, -0.34, 2.28], [-0.18, -0.26, 2.0], [0.38, -0.2, 2.1], [-0.42, -0.04, 2.25]];
+    for (const [x, z, y] of pts) {
+      const s = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 16), glass); s.position.set(x, y, z); g.add(s);
+      const c = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 8), glow); c.position.set(x, y, z); g.add(c);
+      const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 3.0 - y - 0.1, 4), darkMetal()); wire.position.set(x, (3.0 + y + 0.1) / 2, z); g.add(wire);
+    }
+    const L = new THREE.PointLight('#FFE2B0', 8, 7, 1.6); L.position.set(0, 2.0, 0); g.add(L);
+  },
+  toilet(g, w, d, h, it) {
+    const c = M(it.c1, 0.2);
+    bx(g, w, 0.4, d * 0.78, 0, 0, 0.06, c, 0.14);
+    bx(g, w * 0.92, 0.14, 0.22, 0, 0.36, -d / 2 + 0.11, c, 0.05);
+  },
+  vanity(g, w, d, h, it) {
+    bx(g, w, 0.4, d, 0, 0.42, 0, M(it.c2, 0.6), 0.01);
+    bx(g, w, 0.04, d, 0, 0.82, 0, M(it.c1, 0.25), 0.01);
+    const xs = it.double ? [-w / 4, w / 4] : [0];
+    for (const x of xs) {
+      const b = cyl(g, 0.2, 0.17, 0.12, x, 0.86, 0.02, M('#FAFAF8', 0.15), 36); b.scale.z = 0.72;
+      cyl(g, 0.012, 0.012, 0.22, x, 0.86, -d / 2 + 0.06, chrome(), 10);
+    }
+    bx(g, w * 0.92, 0.85, 0.02, 0, 1.15, -d / 2 + 0.01, M('#D9E2E6', 0.02, 1.0), 0, false);
+  },
+  tub(g, w, d, h, it) {
+    bx(g, w, h, d, 0, 0, 0, M(it.c1, 0.15), 0.18);
+    bx(g, w - 0.16, 0.02, d - 0.16, 0, h - 0.07, 0, new THREE.MeshPhysicalMaterial({ color: '#9FC9D6', roughness: 0.02, transparent: true, opacity: 0.6 }), 0, false);
+  },
+  shower(g, w, d, h, it) {
+    bx(g, w, 0.04, d, 0, 0, 0, M('#E9E8E4', 0.4));
+    bx(g, w, h, 0.01, 0, 0.04, d / 2 - 0.005, glassMat, 0, false);
+    bx(g, 0.01, h, d * 0.6, w / 2 - 0.005, 0.04, d / 2 - d * 0.3, glassMat, 0, false);
+    cyl(g, 0.12, 0.12, 0.01, 0, 2.05, -d / 2 + 0.3, chrome(), 24);
+    cyl(g, 0.01, 0.01, 0.3, 0, 2.05, -d / 2 + 0.05, chrome(), 8).rotation.x = Math.PI / 2;
+  },
+  appliance(g, w, d, h, it) {
+    bx(g, w, h, d, 0, 0, 0, M(it.c1, 0.3, 0.4), 0.01);
+    bx(g, 0.02, h * 0.5, 0.02, w / 2 - 0.06, h * 0.4, d / 2 + 0.01, chrome());
+  },
+  desk(g, w, d, h, it) {
+    const met = M(it.c2, 0.25, 0.9);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl(g, 0.012, 0.012, h - 0.03, sx * (w / 2 - 0.03), 0, sz * (d / 2 - 0.03), met, 10);
+    for (const s of [-1, 1]) bx(g, w - 0.06, 0.02, 0.02, 0, h - 0.06, s * (d / 2 - 0.03), met);
+    bx(g, w, 0.025, d, 0, h - 0.025, 0, M(it.c1, 0.4));
+  },
+  officeChair(g, w, d, h, it) {
+    const met = M(it.c2, 0.25, 0.9);
+    cyl(g, 0.3, 0.3, 0.02, 0, 0, 0, met); cyl(g, 0.025, 0.025, 0.4, 0, 0.02, 0, met);
+    bx(g, w * 0.82, 0.05, d * 0.75, 0, 0.42, 0.04, M(it.c1, 0.5), 0.02);
+    bx(g, w * 0.82, h - 0.48, 0.04, 0, 0.48, -d / 2 + 0.08, M(it.c1, 0.5), 0.02);
+    for (const s of [-1, 1]) bx(g, 0.03, 0.03, d * 0.6, s * w * 0.42, 0.6, 0, met);
+  },
+  bench(g, w, d, h, it) {
+    const met = M(it.c2, 0.25, 0.9);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) bx(g, 0.03, h - 0.12, 0.03, sx * (w / 2 - 0.03), 0, sz * (d / 2 - 0.03), met);
+    for (let k = 0; k < 3; k++) bx(g, w / 3 - 0.006, 0.11, d, -w / 3 + k * w / 3, h - 0.12, 0, M(it.c1, 0.55), 0.02);
+  },
+};
+
+const furnGroup = new THREE.Group(); scene.add(furnGroup);
+const pickables = [];
+for (const it of ITEMS) {
+  const [w, d, h] = it.dims.map(v => v / 100);
+  const g = new THREE.Group();
+  (B[it.type] || B.cabinet)(g, w, d, h, it);
+  g.position.set(it.pos[0] * MM, 0.008, it.pos[1] * MM);
+  g.rotation.y = it.rot * Math.PI / 180;
+  g.userData.item = it;
+  g.traverse(o => { if (o.isMesh) pickables.push(o); });
+  const el = document.createElement('div');
+  const inner = document.createElement('div');
+  inner.className = 'fl';
+  inner.innerHTML = `${it.brand} <i>· ${it.model.split(' (')[0]}</i>`;
+  el.appendChild(inner);
+  const lab = new CSS2DObject(el);
+  const top = it.type === 'pendant' ? 2.5 : it.type === 'arco' ? 1.3 : (it.elev || 0) + h;
+  lab.position.set(0, top + 0.25, 0);
+  g.add(lab);
+  it.labelEl = inner;
+  it.group = g;
+  furnGroup.add(g);
+}
+
+// Room labels
+for (const room of ROOMS) {
+  if (!room.label) continue;
+  const el = document.createElement('div');
+  el.className = 'rl' + (room.dim ? ' dim' : '');
+  el.innerHTML = `<b>${room.ko}</b><span>${room.zh}${room.area ? ' · ' + room.area.toFixed(2) + '㎡' : ''}</span>`;
+  const o = new CSS2DObject(el);
+  o.position.set(room.label[0] * MM, 0.05, room.label[1] * MM);
+  scene.add(o);
+}
+
+buildWalls(false);
+
+/* ============================================================
+   6. SELECTION, VIEWS, UI
+   ============================================================ */
+const accentColor = () => new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#86653A');
+const selBox = new THREE.Box3Helper(new THREE.Box3(), accentColor());
+selBox.visible = false; scene.add(selBox);
+let selected = null;
+
+const roomById = Object.fromEntries(ROOMS.map(r => [r.id, r]));
+const detail = document.getElementById('detail');
+function renderDetail(it) {
+  const room = roomById[it.room];
+  detail.innerHTML = `
+    <div class="top"><span class="pill ${it.fixed ? 'fixed' : 'prop'}">${it.fixed ? '확정' : '제안'}</span><span class="pill">${it.cat}</span></div>
+    <div><div class="brand">${it.brand}</div><div class="model">${it.model}</div></div>
+    <dl class="kv">
+      ${it.designer ? `<dt>디자이너</dt><dd>${it.designer}</dd>` : ''}
+      <dt>치수</dt><dd class="mono">W ${it.dims[0]} × D ${it.dims[1]} × H ${it.dims[2]} cm</dd>
+      <dt>위치</dt><dd>${room.ko} <span style="color:var(--muted)">${room.zh}</span></dd>
+    </dl>
+    ${it.note ? `<div class="note">${it.note}</div>` : ''}`;
+}
+function select(it, fly = false) {
+  if (selected) { selected.labelEl.classList.remove('sel'); }
+  selected = it;
+  document.querySelectorAll('.items button').forEach(b => b.setAttribute('aria-current', b.dataset.id === it.id ? 'true' : 'false'));
+  it.labelEl.classList.add('sel');
+  selBox.box.setFromObject(it.group, true);
+  selBox.material.color.copy(accentColor());
+  selBox.visible = true;
+  renderDetail(it);
+  if (fly) focusItem(it);
+}
+
+// Schedule list
+const scheduleEl = document.getElementById('schedule');
+const order = ['living', 'family', 'kitchen', 'foyer', 'lift', 'master', 'cloak', 'mbath', 'bed3', 'bed2', 'bed4', 'balcony', 'bath1', 'bath2', 'bath3', 'equip'];
+for (const rid of order) {
+  const list = ITEMS.filter(i => i.room === rid); if (!list.length) continue;
+  const room = roomById[rid];
+  const sec = document.createElement('div'); sec.className = 'room';
+  sec.innerHTML = `<div class="room-h"><b>${room.ko}</b><span>${room.zh}${room.area ? ' · ' + room.area.toFixed(2) + '㎡' : ''}</span></div>`;
+  const ul = document.createElement('ul'); ul.className = 'items';
+  // collapse identical repeats (e.g. 6 dining chairs) into one row
+  const seen = new Map();
+  for (const it of list) {
+    const key = it.brand + '|' + it.model + '|' + it.type;
+    if (seen.has(key)) { seen.get(key).count++; continue; }
+    seen.set(key, { it, count: 1 });
+  }
+  for (const { it, count } of seen.values()) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.id = 'item-' + it.id; b.dataset.id = it.id;
+    b.innerHTML = `<span class="b">${it.fixed ? '<span class="star">★ </span>' : ''}${it.brand} <span class="m">${it.model.split(' (')[0]}</span></span>
+      <span class="c">${it.cat.replace(/ \d\/6$/, '')}${count > 1 ? ' × ' + count : ''}</span>
+      <span class="d">${it.dims[0]}×${it.dims[1]}</span>`;
+    b.addEventListener('click', () => select(it, true));
+    li.appendChild(b); ul.appendChild(li);
+  }
+  sec.appendChild(ul); scheduleEl.appendChild(sec);
+}
+const brands = new Set(ITEMS.map(i => i.brand));
+document.getElementById('stats').innerHTML = `
+  <div class="stat"><b>${ITEMS.length}</b><span>배치 가구·설비</span></div>
+  <div class="stat"><b>${brands.size}</b><span>브랜드</span></div>
+  <div class="stat"><b>335㎡</b><span>건축면적 (4房2厅4卫)</span></div>`;
+
+// Camera tween
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let tween = null;
+function fly(pos, target, dur = 900) {
+  if (reduceMotion) { camera.position.copy(pos); controls.target.copy(target); return; }
+  tween = { p0: camera.position.clone(), t0: controls.target.clone(), p1: pos, t1: target, start: performance.now(), dur };
+}
+function topDistance() {
+  const v = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  return Math.max(26.5 / v, 19 / (v * camera.aspect)) * 1.04;
+}
+const VIEWS = {
+  overview: () => [new THREE.Vector3(CX + 15, 25, CZ + 21), new THREE.Vector3(CX + 0.5, 0, CZ)],
+  top: () => [new THREE.Vector3(CX, topDistance(), CZ + 0.01), new THREE.Vector3(CX, 0, CZ)],
+  living: () => [new THREE.Vector3(11.4, 5.6, 6.4), new THREE.Vector3(14.6, 0.3, 12.6)],
+  dining: () => [new THREE.Vector3(16.6, 3.6, 12.0), new THREE.Vector3(12.8, 0.6, 6.8)],
+  master: () => [new THREE.Vector3(18.5, 6.5, 27.0), new THREE.Vector3(15.0, 0, 19.8)],
+  beds: () => [new THREE.Vector3(5.5, 9.5, 29.5), new THREE.Vector3(10.2, 0, 21.0)],
+};
+function setView(name) {
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === name ? 'true' : 'false'));
+  const [p, t] = VIEWS[name]();
+  // narrow (portrait) screens: back the camera off along the same line of sight
+  if (name !== 'top' && camera.aspect < 1.25) p.copy(t.clone().add(p.clone().sub(t).multiplyScalar(Math.pow(1.25 / camera.aspect, 0.75))));
+  fly(p, t);
+}
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+function focusItem(it) {
+  const t = new THREE.Vector3(it.pos[0] * MM, 0.5, it.pos[1] * MM);
+  const dir = camera.position.clone().sub(controls.target); dir.y = 0;
+  if (dir.lengthSq() < 1e-4) dir.set(0.6, 0, 1);
+  dir.normalize().multiplyScalar(4.6);
+  fly(new THREE.Vector3(t.x + dir.x, 4.0, t.z + dir.z), t);
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+}
+
+document.getElementById('t-walls').addEventListener('change', e => buildWalls(e.target.checked));
+document.getElementById('t-labels').addEventListener('change', e => stage.classList.toggle('show-all', e.target.checked));
+
+// Picking (click without drag)
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let down = null;
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(pickables, false)[0];
+  if (!hit) return null;
+  let o = hit.object; while (o && !o.userData.item) o = o.parent;
+  return o ? o.userData.item : null;
+}
+renderer.domElement.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) return;
+  const it = pick(e); if (it) select(it, false);
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse' || e.buttons) return;
+  renderer.domElement.style.cursor = pick(e) ? 'pointer' : 'grab';
+});
+
+// Resize
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  renderer.domElement.style.width = w + 'px'; renderer.domElement.style.height = h + 'px';
+  labelRenderer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stage);
+resize();
+
+// Compass follows camera azimuth (north = −z)
+const needle = document.getElementById('needle');
+function updateCompass() {
+  const az = Math.atan2(camera.position.x - controls.target.x, camera.position.z - controls.target.z);
+  needle.parentNode.style.transform = `rotate(${(az * 180 / Math.PI).toFixed(1)}deg)`;
+}
+
+// Initial state
+const [p0, t0] = VIEWS.overview();
+if (camera.aspect < 1.25) p0.copy(t0.clone().add(p0.clone().sub(t0).multiplyScalar(Math.pow(1.25 / camera.aspect, 0.75))));
+camera.position.copy(p0); controls.target.copy(t0);
+select(ITEMS[0], false);
+document.getElementById('loading').remove();
+
+function loop(now) {
+  if (tween) {
+    const k = Math.min(1, (now - tween.start) / tween.dur), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    camera.position.lerpVectors(tween.p0, tween.p1, e);
+    controls.target.lerpVectors(tween.t0, tween.t1, e);
+    if (k >= 1) tween = null;
+  }
+  controls.update();
+  updateCompass();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
