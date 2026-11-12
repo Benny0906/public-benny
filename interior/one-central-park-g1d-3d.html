@@ -67,6 +67,11 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
   background: var(--accent); color: var(--accent-ink); padding: 6px 6px 6px 12px; border-radius: 8px; font-size: 12.5px; }
 .walkbar button { border: 0; border-radius: 6px; padding: 4px 10px; background: var(--accent-ink); color: var(--accent); font-weight: 700; cursor: pointer; }
 .toast { position: absolute; left: 50%; top: 56px; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 5px 12px; border-radius: 6px; font-size: 12px; pointer-events: none; }
+.manbar { position: absolute; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); right: 12px; width: fit-content; display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center;
+  background: var(--label-bg); border: 1px solid var(--line); border-radius: 10px; padding: 5px 6px 5px 10px; font-size: 12px; color: var(--muted); backdrop-filter: blur(6px); }
+.manbar .seg button { padding: 4px 9px; font-size: 12px; }
+.manview { border: 0; border-radius: 7px; padding: 5px 10px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 12px; cursor: pointer; }
+.walking .manbar { display: none; }
 .toggle.edit { color: var(--accent); font-weight: 700; }
 .editbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; align-items: center;
   max-width: calc(100% - 24px); background: var(--label-bg); border: 1px solid var(--accent); border-radius: 10px; padding: 6px 8px; backdrop-filter: blur(6px); }
@@ -215,6 +220,14 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
       <button id="walk-exit" type="button" data-t="walkExit"></button>
     </div>
     <div class="toast" id="toast" hidden></div>
+    <div class="manbar" id="manbar">
+      <span data-t="manLabel"></span>
+      <div class="seg" role="group" aria-label="mannequin">
+        <button type="button" id="who-me" data-who="me" aria-pressed="true" data-t="manMe"></button>
+        <button type="button" id="who-wife" data-who="wife" aria-pressed="false" data-t="manWife"></button>
+      </div>
+      <button type="button" class="manview" id="man-view" data-t="manView"></button>
+    </div>
     <div class="editbar" id="editbar" hidden>
       <span class="ebl" id="edit-name"></span>
       <button type="button" id="rot-l" data-t="rotL"></button>
@@ -329,8 +342,9 @@ const T = {
     wallsFull: '벽 전체 높이', labelsAll: '브랜드 라벨 전부', pinyin: '병음 표시',
     editToggle: '배치 편집', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '이 가구 원위치', resetAll: '전체 원위치', editPick: '가구를 눌러 선택하세요',
     editHint: '<b>배치 편집</b> · 가구를 끌어서 이동 · 아래 버튼으로 회전 · 빈 곳 드래그: 화면 회전', editBlocked: '벽 밖이나 창 밖으로는 옮길 수 없어요', editSaved: '배치 저장됨',
-    walkbar: '<b>걷기 모드</b> · 더블클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤', walkExit: '전체 보기로',
-    hint: '<b>더블클릭</b>: 그 자리로 걸어 들어가기 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션',
+    walkbar: '<b>1인칭</b> · 바닥 화살표 클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤', walkExit: '전체 보기로',
+    hint: '<b>더블클릭</b>: 마네킹이 그 자리로 걸어감 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션',
+    manMe: '본인 175', manWife: '아내 163', manView: '마네킹 눈높이로 보기', manLabel: '마네킹',
     toastWall: '벽이나 창 밖으로는 나갈 수 없어요', toastFloor: '바닥이나 가구 쪽을 더블클릭하세요',
     planH: '안 (공유 저장)', rename: '이름 바꾸기', saveNew: '현재 선택을 새 안으로 저장', planPlaceholder: '새 안 이름 (예: A안 · 아내 의견 반영)',
     planLocal: '이 기기에만 저장 중', planNone: '저장된 안 없음 · 지금 선택은 이 기기에만 저장됩니다', planShared: '공유 저장됨 · 같은 링크를 연 사람 모두 같은 안을 봅니다',
@@ -353,8 +367,9 @@ const T = {
     wallsFull: '墙体全高', labelsAll: '显示全部品牌', pinyin: '显示拼音',
     editToggle: '编辑布局', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '此家具复位', resetAll: '全部复位', editPick: '请点击选择家具',
     editHint: '<b>编辑布局</b> · 拖动家具移动 · 用下方按钮旋转 · 拖动空白处：旋转视角', editBlocked: '不能移到墙外或窗外', editSaved: '布局已保存',
-    walkbar: '<b>漫游模式</b> · 双击：移动到该位置 · 拖动：环视 · 滚轮 / W·S：前后移动', walkExit: '返回全景',
-    hint: '<b>双击</b>：走进该位置 · 拖动：旋转 · 滚轮：缩放 · 点击家具：详情与选项',
+    walkbar: '<b>第一人称</b> · 点击地面箭头：移动到该位置 · 拖动：环视 · 滚轮 / W·S：前后移动', walkExit: '返回全景',
+    hint: '<b>双击</b>：人偶走到该位置 · 拖动：旋转 · 滚轮：缩放 · 点击家具：详情与选项',
+    manMe: '本人 175', manWife: '夫人 163', manView: '以人偶视高查看', manLabel: '人偶',
     toastWall: '无法穿过墙体或窗户', toastFloor: '请双击地面或家具附近',
     planH: '方案（共享保存）', rename: '重命名', saveNew: '将当前选择保存为新方案', planPlaceholder: '新方案名称（例：A 方案 · 夫人意见）',
     planLocal: '仅保存在本设备', planNone: '尚无保存的方案 · 当前选择仅保存在本设备', planShared: '已共享保存 · 打开同一链接的人都能看到',
@@ -1809,7 +1824,7 @@ const VIEWS = {
 const narrow = (p, t) => camera.aspect < 1.25 ? t.clone().add(p.clone().sub(t).multiplyScalar(Math.pow(1.25 / camera.aspect, 0.75))) : p;
 function pressView(name) { document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === name ? 'true' : 'false')); }
 function setView(name) {
-  if (name === 'walk') { enterWalk(10.6, 13.3, -Math.PI / 2); return; }
+  if (name === 'walk') { enterWalk(man.x, man.z, man.yaw); return; }
   if (mode === 'walk') exitWalk();
   pressView(name);
   const [p, t] = VIEWS[name]();
@@ -1817,14 +1832,83 @@ function setView(name) {
 }
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
 
-// ---- walk mode ----
-const EYE = 1.6;
+// ---- mannequin (scale figure) + walk mode ----
+const HEIGHTS = { me: 1.75, wife: 1.63 };
+let WHO = store.get('g1d-who', 'me') === 'wife' ? 'wife' : 'me';
+const eyeH = () => HEIGHTS[WHO] * 0.935;
 let mode = 'orbit', yaw = 0, pitch = 0, wallsBeforeWalk = false, walkTween = null;
+const man = { x: 10.6, z: 13.3, yaw: -Math.PI / 2, tween: null, phase: 0, g: new THREE.Group(), legs: [], arms: [] };
+scene.add(man.g);
+function buildMannequin() {
+  man.g.clear(); man.legs = []; man.arms = [];
+  const H = HEIGHTS[WHO], s = H / 1.75;
+  const skin = M(WHO === 'me' ? '#3E5C7A' : '#8E4B5A', 0.6), head = M('#E8DCCF', 0.7);
+  const cap = (r, len, mat) => new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 6, 14), mat);
+  for (const sx of [-1, 1]) {
+    const pivot = new THREE.Group(); pivot.position.set(sx * 0.1 * s, 0.86 * s, 0);
+    const leg = cap(0.07 * s, 0.7 * s, skin); leg.position.y = -0.42 * s; leg.castShadow = true; pivot.add(leg);
+    man.g.add(pivot); man.legs.push(pivot);
+    const ap = new THREE.Group(); ap.position.set(sx * 0.24 * s, 1.42 * s, 0);
+    const arm = cap(0.05 * s, 0.56 * s, skin); arm.position.y = -0.32 * s; arm.castShadow = true; ap.add(arm);
+    man.g.add(ap); man.arms.push(ap);
+  }
+  const torso = cap(0.17 * s, 0.42 * s, skin); torso.position.y = 1.18 * s; torso.scale.z = 0.7; torso.castShadow = true; man.g.add(torso);
+  const hd = new THREE.Mesh(new THREE.SphereGeometry(0.11 * s, 24, 16), head); hd.position.y = (H - 0.11 * s); hd.castShadow = true; man.g.add(hd);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.03 * s, 0.07 * s, 10), head); nose.rotation.x = -Math.PI / 2; nose.position.set(0, H - 0.12 * s, -0.11 * s); man.g.add(nose);
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.32, 0.36, 40), new THREE.MeshBasicMaterial({ color: WHO === 'me' ? '#3E5C7A' : '#8E4B5A', transparent: true, opacity: 0.8 }));
+  ring.rotation.x = -Math.PI / 2; ring.position.y = 0.015; man.g.add(ring);
+  placeMan();
+}
+function placeMan() { man.g.position.set(man.x, 0.008, man.z); man.g.rotation.y = man.yaw; }
+function walkMan(x, z) {
+  const dx = x - man.x, dz = z - man.z, dist = Math.hypot(dx, dz); if (dist < 0.05) return;
+  const targetYaw = Math.atan2(-dx, -dz);
+  man.tween = { x0: man.x, z0: man.z, x1: x, z1: z, y0: man.yaw, y1: man.yaw + (((targetYaw - man.yaw + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI), start: performance.now(), dur: Math.max(500, dist / 1.3 * 1000) };
+}
+function animMan(now) {
+  if (!man.tween) { man.legs.forEach(l => { l.rotation.x *= 0.8; }); man.arms.forEach(a => { a.rotation.x *= 0.8; }); return; }
+  const t = man.tween, k = Math.min(1, (now - t.start) / t.dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+  man.x = t.x0 + (t.x1 - t.x0) * e; man.z = t.z0 + (t.z1 - t.z0) * e;
+  man.yaw = t.y0 + (t.y1 - t.y0) * Math.min(1, k * 4);
+  const sw = Math.sin(now / 1000 * 2 * Math.PI * 1.7) * 0.5 * (1 - Math.pow(2 * k - 1, 8));
+  man.legs[0].rotation.x = sw; man.legs[1].rotation.x = -sw; man.arms[0].rotation.x = -sw * 0.7; man.arms[1].rotation.x = sw * 0.7;
+  placeMan();
+  if (k >= 1) man.tween = null;
+}
+function setWho(w) {
+  WHO = w === 'wife' ? 'wife' : 'me'; store.set('g1d-who', WHO);
+  document.querySelectorAll('[data-who]').forEach(b => b.setAttribute('aria-pressed', b.dataset.who === WHO ? 'true' : 'false'));
+  buildMannequin();
+  if (mode === 'walk') camera.position.y = eyeH();
+}
+document.querySelectorAll('[data-who]').forEach(b => b.addEventListener('click', () => setWho(b.dataset.who)));
+document.getElementById('man-view').addEventListener('click', () => enterWalk(man.x, man.z, man.yaw));
+// floor arrow cursor (first person)
+const cursor = new THREE.Group();
+{
+  const mat = new THREE.MeshBasicMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.85, depthWrite: false });
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.22, 0.27, 40), mat); ring.rotation.x = -Math.PI / 2; cursor.add(ring);
+  const sh = new THREE.Shape(); sh.moveTo(0, 0.2); sh.lineTo(0.11, 0.02); sh.lineTo(0.04, 0.04); sh.lineTo(0.04, -0.14); sh.lineTo(-0.04, -0.14); sh.lineTo(-0.04, 0.04); sh.lineTo(-0.11, 0.02); sh.closePath();
+  const arrow = new THREE.Mesh(new THREE.ShapeGeometry(sh), mat); arrow.rotation.x = -Math.PI / 2; cursor.add(arrow);
+  cursor.position.y = 0.02; cursor.visible = false; cursor.renderOrder = 5; scene.add(cursor);
+}
+function floorHit(ev) {
+  setRay(ev);
+  const h = ray.intersectObjects([...floorMeshes, wallGroup, furnGroup], true).filter(x => x.object.isMesh && x.object.material !== glassMat)[0];
+  if (!h || !floorMeshes.includes(h.object) || !walkable(h.point.x, h.point.z)) return null;
+  return h.point;
+}
+function showCursor(p) {
+  if (!p) { cursor.visible = false; return; }
+  cursor.visible = true; cursor.position.set(p.x, 0.02, p.z);
+  cursor.rotation.y = Math.atan2(-(p.x - camera.position.x), -(p.z - camera.position.z));
+}
 const walkbar = document.getElementById('walkbar'), hint = document.getElementById('hint'), toastEl = document.getElementById('toast');
 let toastTimer = null;
 function toast(msg) { toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { toastEl.hidden = true; }, 1600); }
 function walkTo(x, z) {
-  const p1 = new THREE.Vector3(x, EYE, z);
+  man.x = x; man.z = z;
+  const p1 = new THREE.Vector3(x, eyeH(), z);
   if (reduceMotion) { camera.position.copy(p1); return; }
   walkTween = { p0: camera.position.clone(), p1, start: performance.now(), dur: 700 };
 }
@@ -1839,7 +1923,7 @@ function enterWalk(x, z, yawOverride) {
     mode = 'walk'; controls.enabled = false; tween = null;
     camera.rotation.order = 'YXZ';
     camera.fov = 62; camera.updateProjectionMatrix();
-    stage.classList.add('walking'); walkbar.hidden = false; hint.hidden = true; editbar.hidden = true;
+    stage.classList.add('walking'); walkbar.hidden = false; hint.hidden = true; editbar.hidden = true; man.g.visible = false;
     pressView('walk');
   } else if (yawOverride != null) yaw = yawOverride;
   walkTo(x, z);
@@ -1852,12 +1936,13 @@ function exitWalk() {
   controls.enabled = true;
   buildWalls(wallsBeforeWalk);
   stage.classList.remove('walking'); walkbar.hidden = true; hint.hidden = false; renderEditbar();
+  man.x = camera.position.x; man.z = camera.position.z; man.yaw = yaw; man.tween = null; placeMan(); man.g.visible = true; cursor.visible = false;
 }
 document.getElementById('walk-exit').addEventListener('click', () => setView('overview'));
 function stepWalk(forward, strafe) {
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
   const nx = camera.position.x + fx * forward + (-fz) * strafe, nz = camera.position.z + fz * forward + fx * strafe;
-  if (walkable(nx, nz)) { walkTween = null; camera.position.x = nx; camera.position.z = nz; }
+  if (walkable(nx, nz)) { walkTween = null; camera.position.x = nx; camera.position.z = nz; man.x = nx; man.z = nz; }
   else toast(T[LANG].toastWall);
 }
 
@@ -1905,7 +1990,7 @@ function onDouble(ev) {
   const p = walkTarget(ev);
   if (!p) { toast(T[LANG].toastFloor); return; }
   if (mode === 'walk') walkTo(p.x, p.z);
-  else enterWalk(p.x, p.z);
+  else walkMan(p.x, p.z);
 }
 const cv = renderer.domElement;
 let down = null, last = null, lastTap = null, pointers = 0;
@@ -1921,7 +2006,8 @@ cv.addEventListener('pointermove', e => {
     last = { x: e.clientX, y: e.clientY };
     return;
   }
-  if (e.pointerType === 'mouse' && !e.buttons) cv.style.cursor = mode === 'walk' ? (pick(e) ? 'pointer' : 'grab') : (pick(e) ? 'pointer' : 'grab');
+  if (mode === 'walk' && !e.buttons && e.pointerType === 'mouse') { const it = pick(e); showCursor(it ? null : floorHit(e)); cv.style.cursor = it ? 'pointer' : 'grab'; return; }
+  if (e.pointerType === 'mouse' && !e.buttons) cv.style.cursor = pick(e) ? 'pointer' : 'grab';
 });
 function endPointer(e) {
   pointers = Math.max(0, pointers - 1);
@@ -1932,7 +2018,9 @@ function endPointer(e) {
   const now = performance.now();
   if (lastTap && now - lastTap.t < 330 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) { lastTap = null; onDouble(e); return; }
   lastTap = { t: now, x: e.clientX, y: e.clientY };
-  const it = pick(e); if (it) select(it, false);
+  const it = pick(e);
+  if (it) { select(it, false); return; }
+  if (mode === 'walk') { const p = floorHit(e); if (p) { showCursor(p); walkTo(p.x, p.z); } }
 }
 cv.addEventListener('pointerup', endPointer);
 cv.addEventListener('pointercancel', () => { pointers = Math.max(0, pointers - 1); down = null; });
@@ -1971,9 +2059,11 @@ function updateCompass() {
 const [p0, t0] = VIEWS.overview();
 camera.position.copy(narrow(p0, t0)); controls.target.copy(t0);
 select(ITEMS[0], false);
+setWho(WHO);
 document.getElementById('loading').remove();
 
 function loop(now) {
+  animMan(now);
   if (mode === 'walk') {
     if (walkTween) {
       const k = Math.min(1, (now - walkTween.start) / walkTween.dur), e = 1 - Math.pow(1 - k, 3);
