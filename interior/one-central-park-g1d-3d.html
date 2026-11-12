@@ -67,6 +67,14 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
   background: var(--accent); color: var(--accent-ink); padding: 6px 6px 6px 12px; border-radius: 8px; font-size: 12.5px; }
 .walkbar button { border: 0; border-radius: 6px; padding: 4px 10px; background: var(--accent-ink); color: var(--accent); font-weight: 700; cursor: pointer; }
 .toast { position: absolute; left: 50%; top: 56px; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 5px 12px; border-radius: 6px; font-size: 12px; pointer-events: none; }
+.toggle.edit { color: var(--accent); font-weight: 700; }
+.editbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; align-items: center;
+  max-width: calc(100% - 24px); background: var(--label-bg); border: 1px solid var(--accent); border-radius: 10px; padding: 6px 8px; backdrop-filter: blur(6px); }
+.editbar button { border: 1px solid var(--line); background: var(--panel); border-radius: 7px; padding: 5px 9px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.editbar button:hover { border-color: var(--accent); }
+.editbar button:disabled { opacity: 0.45; cursor: default; }
+.editbar .ebl { font-size: 12px; font-weight: 700; padding: 0 4px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.editing canvas { cursor: move; }
 .compass { position: absolute; right: 14px; bottom: 12px; width: 42px; height: 42px; pointer-events: none; }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 13px; }
 
@@ -195,6 +203,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
       </div>
       <label class="toggle"><input type="checkbox" id="t-walls"> <span data-t="wallsFull"></span></label>
       <label class="toggle"><input type="checkbox" id="t-labels"> <span data-t="labelsAll"></span></label>
+      <label class="toggle edit"><input type="checkbox" id="t-edit"> <span data-t="editToggle"></span></label>
     </div>
   </header>
 
@@ -206,6 +215,14 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
       <button id="walk-exit" type="button" data-t="walkExit"></button>
     </div>
     <div class="toast" id="toast" hidden></div>
+    <div class="editbar" id="editbar" hidden>
+      <span class="ebl" id="edit-name"></span>
+      <button type="button" id="rot-l" data-t="rotL"></button>
+      <button type="button" id="rot-r" data-t="rotR"></button>
+      <button type="button" id="rot-90" data-t="rot90"></button>
+      <button type="button" id="reset-one" data-t="resetOne"></button>
+      <button type="button" id="reset-all" data-t="resetAll"></button>
+    </div>
     <div class="hint" id="hint" data-t="hint"></div>
     <svg class="compass" viewBox="0 0 42 42" aria-label="N">
       <circle cx="21" cy="21" r="19" fill="var(--label-bg)" stroke="var(--line)"></circle>
@@ -310,6 +327,8 @@ const T = {
   ko: {
     title: '壹號院 G1-D 가구 배치', walk: '걷기', overview: '전체', top: '평면', living: '거실', study: '서재', master: '마스터', closet: '드레스룸',
     wallsFull: '벽 전체 높이', labelsAll: '브랜드 라벨 전부', pinyin: '병음 표시',
+    editToggle: '배치 편집', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '이 가구 원위치', resetAll: '전체 원위치', editPick: '가구를 눌러 선택하세요',
+    editHint: '<b>배치 편집</b> · 가구를 끌어서 이동 · 아래 버튼으로 회전 · 빈 곳 드래그: 화면 회전', editBlocked: '벽 밖이나 창 밖으로는 옮길 수 없어요', editSaved: '배치 저장됨',
     walkbar: '<b>걷기 모드</b> · 더블클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤', walkExit: '전체 보기로',
     hint: '<b>더블클릭</b>: 그 자리로 걸어 들어가기 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션',
     toastWall: '벽이나 창 밖으로는 나갈 수 없어요', toastFloor: '바닥이나 가구 쪽을 더블클릭하세요',
@@ -332,6 +351,8 @@ const T = {
   zh: {
     title: '壹號院 G1-D 家具布置', walk: '漫游', overview: '全景', top: '平面', living: '客厅', study: '书房', master: '主卧', closet: '衣帽间',
     wallsFull: '墙体全高', labelsAll: '显示全部品牌', pinyin: '显示拼音',
+    editToggle: '编辑布局', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '此家具复位', resetAll: '全部复位', editPick: '请点击选择家具',
+    editHint: '<b>编辑布局</b> · 拖动家具移动 · 用下方按钮旋转 · 拖动空白处：旋转视角', editBlocked: '不能移到墙外或窗外', editSaved: '布局已保存',
     walkbar: '<b>漫游模式</b> · 双击：移动到该位置 · 拖动：环视 · 滚轮 / W·S：前后移动', walkExit: '返回全景',
     hint: '<b>双击</b>：走进该位置 · 拖动：旋转 · 滚轮：缩放 · 点击家具：详情与选项',
     toastWall: '无法穿过墙体或窗户', toastFloor: '请双击地面或家具附近',
@@ -1352,6 +1373,22 @@ try { localChoice = JSON.parse(store.get('g1d-choice2', '{}')) || {}; } catch (e
 CHOICE = validChoice(localChoice);
 ITEMS.forEach(it => { if (it.slot) applySlot(it); });
 
+// user layout overrides: { itemId: [planX_mm, planY_mm, rotDeg] }
+const BASE = Object.fromEntries(ITEMS.map(it => [it.id, { pos: [...it.pos], rot: it.rot }]));
+let LAYOUT = {};
+try { LAYOUT = JSON.parse(store.get('g1d-layout', '{}')) || {}; } catch (e) { LAYOUT = {}; }
+function validLayout(raw) {
+  const out = {};
+  if (raw && typeof raw === 'object') for (const [k, v] of Object.entries(raw)) if (BASE[k] && Array.isArray(v) && v.length === 3 && v.every(n => typeof n === 'number' && isFinite(n))) out[k] = v;
+  return out;
+}
+function placeFromLayout(it) {
+  const o = LAYOUT[it.id];
+  it.pos = o ? [o[0], o[1]] : [...BASE[it.id].pos];
+  it.rot = o ? o[2] : BASE[it.id].rot;
+}
+LAYOUT = validLayout(LAYOUT);
+ITEMS.forEach(placeFromLayout);
 const furnGroup = new THREE.Group(); scene.add(furnGroup);
 let selected = null;
 function buildItem(it) {
@@ -1486,7 +1523,7 @@ function select(it, fly = false) {
   selBox.box.setFromObject(it.group, true);
   selBox.material.color.copy(accentColor());
   selBox.visible = true;
-  renderDetail(); markRows();
+  renderDetail(); markRows(); renderEditbar();
   if (fly) focusItem(it);
 }
 
@@ -1569,8 +1606,9 @@ const planSelect = document.getElementById('plan-select'), planName = document.g
 const planStatus = document.getElementById('plan-status');
 function persistChoice() {
   store.set('g1d-choice2', JSON.stringify(CHOICE));
+  store.set('g1d-layout', JSON.stringify(LAYOUT));
   if (!db || !activePlan || planState === 'readonly') return;
-  const ref = plansCol.doc(activePlan), body = { choice: { ...CHOICE }, updatedAt: new Date().toISOString() };
+  const ref = plansCol.doc(activePlan), body = { choice: { ...CHOICE }, layout: { ...LAYOUT }, updatedAt: new Date().toISOString() };
   planStatus.textContent = L().planSaving;
   writeChain = writeChain.then(() => ref.update(body)).then(() => renderPlans()).catch(onWriteError);
 }
@@ -1600,6 +1638,7 @@ function renderPlans() {
 planSelect.addEventListener('change', () => {
   activePlan = planSelect.value; store.set('g1d-plan', activePlan);
   const p = planDocs.find(x => x.id === activePlan);
+  applyLayout(p ? p.layout : JSON.parse(store.get('g1d-layout', '{}') || '{}'));
   applyChoices(p ? p.choice : localChoice, false);
 });
 document.getElementById('plan-save').addEventListener('click', async () => {
@@ -1609,7 +1648,7 @@ document.getElementById('plan-save').addEventListener('click', async () => {
   try {
     planStatus.textContent = L().planSaving;
     const ref = plansCol.doc();
-    await ref.set({ name, choice: { ...CHOICE }, createdAt: now, updatedAt: now });
+    await ref.set({ name, choice: { ...CHOICE }, layout: { ...LAYOUT }, createdAt: now, updatedAt: now });
     activePlan = ref.id; store.set('g1d-plan', activePlan); planName.value = '';
     planDocs = planDocs.filter(p => p.id !== ref.id).concat([{ id: ref.id, name, choice: { ...CHOICE } }]);
     renderPlans();
@@ -1630,6 +1669,7 @@ document.getElementById('plan-rename').addEventListener('click', async () => {
     if (planState === 'loading' && !snap.metadata.fromCache) planState = 'ready';
     planDocs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.name).sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
     const p = planDocs.find(x => x.id === activePlan);
+    if (p && JSON.stringify(validLayout(p.layout)) !== JSON.stringify(LAYOUT) && !dragging) applyLayout(p.layout);
     if (p && p.choice && JSON.stringify(validChoice(p.choice)) !== JSON.stringify(CHOICE)) applyChoices(p.choice, false);
     else renderPlans();
   }, () => { clearTimeout(timer); planState = 'offline'; renderPlans(); });
@@ -1646,12 +1686,102 @@ function setLang(lang) {
   document.querySelectorAll('[data-view]').forEach(b => { b.textContent = t[b.dataset.view]; });
   document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG ? 'true' : 'false'));
   document.getElementById('foot').innerHTML = t.foot.map(p => `<p>${p}</p>`).join('');
-  renderRoomLabels(); renderAll();
+  renderRoomLabels(); renderAll(); renderEditbar();
 }
 document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 const pyBox = document.getElementById('t-pinyin');
 pyBox.checked = PY;
 pyBox.addEventListener('change', () => { PY = pyBox.checked; store.set('g1d-py', PY ? '1' : '0'); renderRoomLabels(); renderAll(); });
+
+/* ============================================================
+   12. LAYOUT EDITING — drag furniture on the floor, rotate, reset
+   ============================================================ */
+let editing = false, dragging = null;
+const editBox = document.getElementById('t-edit'), editbar = document.getElementById('editbar'), editName = document.getElementById('edit-name');
+function applyLayout(raw) {
+  LAYOUT = validLayout(raw);
+  for (const it of ITEMS) {
+    placeFromLayout(it);
+    it.group.position.set(it.pos[0] * MM, 0.008, it.pos[1] * MM);
+    it.group.rotation.y = it.rot * Math.PI / 180;
+  }
+  if (selected) selBox.box.setFromObject(selected.group, true);
+}
+function commitItem(it) {
+  const b = BASE[it.id];
+  if (Math.abs(it.pos[0] - b.pos[0]) < 1 && Math.abs(it.pos[1] - b.pos[1]) < 1 && Math.abs(((it.rot - b.rot) % 360 + 360) % 360) < 0.5) delete LAYOUT[it.id];
+  else LAYOUT[it.id] = [Math.round(it.pos[0]), Math.round(it.pos[1]), Math.round(it.rot * 10) / 10];
+  persistChoice();
+}
+function moveItem(it, x, y) {
+  it.pos = [x, y];
+  it.group.position.set(x * MM, 0.008, y * MM);
+  selBox.box.setFromObject(it.group, true);
+}
+function rotateItem(it, deg) {
+  it.rot = ((it.rot + deg) % 360 + 360) % 360;
+  it.group.rotation.y = it.rot * Math.PI / 180;
+  selBox.box.setFromObject(it.group, true);
+  commitItem(it);
+}
+function renderEditbar() {
+  editbar.hidden = !editing || mode === 'walk';
+  const has = !!selected;
+  editName.textContent = has ? `${selected.brand} · ${selected.model}` : L().editPick;
+  ['rot-l', 'rot-r', 'rot-90', 'reset-one'].forEach(id => { document.getElementById(id).disabled = !has; });
+  document.getElementById('hint').innerHTML = editing ? L().editHint : L().hint;
+}
+editBox.addEventListener('change', () => {
+  editing = editBox.checked;
+  if (editing && mode === 'walk') setView('top');
+  stage.classList.toggle('editing', editing);
+  renderEditbar();
+});
+document.getElementById('rot-l').addEventListener('click', () => selected && rotateItem(selected, 15));
+document.getElementById('rot-r').addEventListener('click', () => selected && rotateItem(selected, -15));
+document.getElementById('rot-90').addEventListener('click', () => selected && rotateItem(selected, -90));
+document.getElementById('reset-one').addEventListener('click', () => {
+  if (!selected) return;
+  delete LAYOUT[selected.id]; placeFromLayout(selected);
+  moveItem(selected, selected.pos[0], selected.pos[1]); selected.group.rotation.y = selected.rot * Math.PI / 180;
+  selBox.box.setFromObject(selected.group, true); persistChoice();
+});
+document.getElementById('reset-all').addEventListener('click', () => { applyLayout({}); persistChoice(); });
+const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hitPt = new THREE.Vector3(), dragRay = new THREE.Raycaster(), dragNdc = new THREE.Vector2();
+function floorPoint(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  dragNdc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  dragRay.setFromCamera(dragNdc, camera);
+  return dragRay.ray.intersectPlane(floorPlane, hitPt) ? hitPt.clone() : null;
+}
+// capture phase on the stage runs before OrbitControls' own canvas listener, so a furniture drag never starts a camera orbit
+stage.addEventListener('pointerdown', ev => {
+  if (!editing || mode === 'walk' || ev.target !== renderer.domElement || ev.button > 0) return;
+  const it = pick(ev); if (!it) return;
+  const p = floorPoint(ev); if (!p) return;
+  select(it, false); renderEditbar();
+  dragging = { it, id: ev.pointerId, dx: it.pos[0] - p.x / MM, dy: it.pos[1] - p.z / MM, moved: false };
+  controls.enabled = false;
+  try { renderer.domElement.setPointerCapture(ev.pointerId); } catch (e) {}
+}, true);
+stage.addEventListener('pointermove', ev => {
+  if (!dragging || ev.pointerId !== dragging.id) return;
+  const p = floorPoint(ev); if (!p) return;
+  const x = Math.round((p.x / MM + dragging.dx) / 50) * 50, y = Math.round((p.z / MM + dragging.dy) / 50) * 50;
+  if (!walkable(x * MM, y * MM)) return;
+  dragging.moved = true; moveItem(dragging.it, x, y);
+}, true);
+function endDrag(ev) {
+  if (!dragging || (ev && ev.pointerId !== dragging.id)) return;
+  const d = dragging; dragging = null; controls.enabled = true;
+  if (d.moved) { commitItem(d.it); toast(L().editSaved); }
+}
+stage.addEventListener('pointerup', endDrag, true);
+stage.addEventListener('pointercancel', endDrag, true);
+window.addEventListener('keydown', e => {
+  if (!editing || !selected || e.target.closest('input, textarea, select')) return;
+  if (e.key === 'r' || e.key === 'R') { rotateItem(selected, e.shiftKey ? 15 : -15); e.preventDefault(); }
+});
 
 setLang(LANG);
 
@@ -1699,6 +1829,7 @@ function walkTo(x, z) {
   walkTween = { p0: camera.position.clone(), p1, start: performance.now(), dur: 700 };
 }
 function enterWalk(x, z, yawOverride) {
+  if (editing) { editing = false; editBox.checked = false; stage.classList.remove('editing'); }
   if (mode !== 'walk') {
     const f = new THREE.Vector3(); camera.getWorldDirection(f);
     yaw = yawOverride != null ? yawOverride : Math.atan2(-f.x, -f.z);
@@ -1708,7 +1839,7 @@ function enterWalk(x, z, yawOverride) {
     mode = 'walk'; controls.enabled = false; tween = null;
     camera.rotation.order = 'YXZ';
     camera.fov = 62; camera.updateProjectionMatrix();
-    stage.classList.add('walking'); walkbar.hidden = false; hint.hidden = true;
+    stage.classList.add('walking'); walkbar.hidden = false; hint.hidden = true; editbar.hidden = true;
     pressView('walk');
   } else if (yawOverride != null) yaw = yawOverride;
   walkTo(x, z);
@@ -1720,7 +1851,7 @@ function exitWalk() {
   controls.target.copy(camera.position).addScaledVector(f, 3).setY(0.5);
   controls.enabled = true;
   buildWalls(wallsBeforeWalk);
-  stage.classList.remove('walking'); walkbar.hidden = true; hint.hidden = false;
+  stage.classList.remove('walking'); walkbar.hidden = true; hint.hidden = false; renderEditbar();
 }
 document.getElementById('walk-exit').addEventListener('click', () => setView('overview'));
 function stepWalk(forward, strafe) {
@@ -1751,10 +1882,12 @@ function setRay(ev) {
 }
 function pick(ev) {
   setRay(ev);
-  const hit = ray.intersectObject(furnGroup, true)[0];
-  if (!hit) return null;
-  let o = hit.object; while (o && !o.userData.item) o = o.parent;
-  return o ? o.userData.item : null;
+  const items = [];
+  for (const h of ray.intersectObject(furnGroup, true)) {
+    let o = h.object; while (o && !o.userData.item) o = o.parent;
+    if (o && !items.includes(o.userData.item)) items.push(o.userData.item);
+  }
+  return items.find(i => i.type !== 'rug') || items[0] || null;
 }
 function walkTarget(ev) {
   setRay(ev);
@@ -1768,6 +1901,7 @@ function walkTarget(ev) {
   return walkable(p.x, p.z) ? p : null;
 }
 function onDouble(ev) {
+  if (editing) return;
   const p = walkTarget(ev);
   if (!p) { toast(T[LANG].toastFloor); return; }
   if (mode === 'walk') walkTo(p.x, p.z);
@@ -1862,5 +1996,5 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-window.__g1d = { setView, enterWalk, chooseOption, ITEMS, select, applyChoices, setLang };
+window.__g1d = { setView, enterWalk, chooseOption, ITEMS, select, applyChoices, setLang, toScreen: (x, y) => { const v = new THREE.Vector3(x * MM, 0.3, y * MM).project(camera); const r = renderer.domElement.getBoundingClientRect(); return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height }; } };
 </script>
