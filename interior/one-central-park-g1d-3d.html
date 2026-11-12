@@ -1447,6 +1447,61 @@ var tallDecor = new THREE.Group(); decor.add(tallDecor);   // follows the wall-h
   };
   plant(16.75, 10.0, 1.95, 3); plant(13.35, 14.05, 1.7, 7); plant(17.55, 19.0, 1.8, 11); plant(14.2, 0.75, 1.7, 21);
 }
+
+/* ---------- Shanghai view (shown in first person): Huangpu + Lujiazui to the NNE, low-poly city with fog ---------- */
+// plan/web axes: x east, z south. Blender scene uses +Y north, so web z = -Y. Street level is 55 m below the floor.
+const skyline = new THREE.Group(); skyline.visible = false; scene.add(skyline);
+{
+  const GZ = -55, r = rnd(7);
+  const RIVER = [[330, -4000], [340, -1500], [320, 0], [300, 1200], [380, 2100], [700, 2850], [1400, 3350], [2400, 3550], [4200, 3500]], RW = 420;
+  const rdist = (x, y) => { let b = 1e9; for (let i = 0; i < RIVER.length - 1; i++) { const [ax, ay] = RIVER[i], [bx2, by] = RIVER[i + 1], dx = bx2 - ax, dy = by - ay, t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy))); b = Math.min(b, Math.hypot(x - ax - t * dx, y - ay - t * dy)); } return b; };
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(16000, 16000), new THREE.MeshStandardMaterial({ color: '#8A8F82', roughness: 1 }));
+  ground.rotation.x = -Math.PI / 2; ground.position.set(500, GZ, -500); skyline.add(ground);
+  const water = new THREE.MeshStandardMaterial({ color: '#5A6B70', roughness: 0.12, metalness: 0.3 });
+  for (let i = 0; i < RIVER.length - 1; i++) {
+    const [ax, ay] = RIVER[i], [bx2, by] = RIVER[i + 1], L = Math.hypot(bx2 - ax, by - ay);
+    const seg = new THREE.Mesh(new THREE.PlaneGeometry(L + RW * 0.6, RW), water);
+    seg.rotation.set(-Math.PI / 2, 0, Math.atan2(by - ay, bx2 - ax)); seg.position.set((ax + bx2) / 2, GZ + 0.3, -(ay + by) / 2); skyline.add(seg);
+  }
+  const boxes = [];
+  for (let gx = -3600; gx < 5200; gx += 90) for (let gy = -3600; gy < 5200; gy += 90) {
+    const x = gx + (r() - 0.5) * 40, y = gy + (r() - 0.5) * 40;
+    if (Math.hypot(x - 9, y + 12) < 140 || rdist(x, y) < RW / 2 + 40 || r() < 0.3) continue;
+    const dl = Math.hypot(x - 1350, y - 2350), dp = Math.hypot(x - 1050, y - 2550);
+    if (dp < 130 || Math.hypot(x - 1500, y - 2320) < 150) continue;
+    const h = dp < 420 ? 40 + r() * 50 : dl < 650 ? 120 + r() * 180 : dl < 1500 && x > 380 ? 60 + r() * 130 : (r() < 0.66 ? 18 + r() * 27 : 60 + r() * 80);
+    boxes.push([x, y, 25 + r() * 30, h, r()]);
+  }
+  const geo = new THREE.BoxGeometry(1, 1, 1); geo.translate(0, 0.5, 0);
+  const cols = ['#7F93A6', '#8E9398', '#A39A8E', '#5E6A74'];
+  const inst = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ roughness: 0.5, metalness: 0.2 }), boxes.length);
+  const m4 = new THREE.Matrix4(), col = new THREE.Color();
+  boxes.forEach(([x, y, w, h, t], i) => {
+    m4.compose(new THREE.Vector3(x, GZ, -y), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), (t - 0.5) * 0.4), new THREE.Vector3(w, h, w * (0.7 + t * 0.6)));
+    inst.setMatrixAt(i, m4); inst.setColorAt(i, col.set(cols[Math.floor(t * 4) % 4]));
+  });
+  skyline.add(inst);
+  const pink = new THREE.MeshStandardMaterial({ color: '#C8407E', roughness: 0.2, metalness: 0.4 }), silver = new THREE.MeshStandardMaterial({ color: '#C9CED3', roughness: 0.25, metalness: 0.7 });
+  const at = (mesh, x, y, z) => { mesh.position.set(x, z, -y); skyline.add(mesh); return mesh; };
+  const px = 1050, py = 2550;
+  for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3; at(new THREE.Mesh(new THREE.CylinderGeometry(4.5, 5, 290, 12), silver), px + 8 * Math.cos(a), py + 8 * Math.sin(a), GZ + 145); }
+  at(new THREE.Mesh(new THREE.SphereGeometry(25, 32, 16), pink), px, py, GZ + 93);
+  at(new THREE.Mesh(new THREE.SphereGeometry(22.5, 32, 16), pink), px, py, GZ + 263);
+  at(new THREE.Mesh(new THREE.SphereGeometry(8, 20, 10), pink), px, py, GZ + 350);
+  at(new THREE.Mesh(new THREE.CylinderGeometry(0.6, 3.5, 112, 10), silver), px, py, GZ + 412);
+  const glassT = new THREE.MeshStandardMaterial({ color: '#9FB3C2', roughness: 0.15, metalness: 0.6 });
+  // Shanghai Tower: twisted tapering rounded triangle
+  { const pts = []; const N = 48, rings = 30, pos = [], idx = [];
+    for (let j = 0; j <= rings; j++) { const f = j / rings, sc = 1 - 0.55 * f, tw = (120 * Math.PI / 180) * f;
+      for (let k = 0; k < N; k++) { const th = k / N * Math.PI * 2, rr = 42 * sc * (1 + 0.11 * Math.cos(3 * th)); pos.push(1500 + rr * Math.cos(th + tw), GZ + 600 * f, -(2240 + rr * Math.sin(th + tw))); } }
+    for (let j = 0; j < rings; j++) for (let k = 0; k < N; k++) { const a = j * N + k, b = j * N + (k + 1) % N, c2 = a + N, d = b + N; idx.push(a, c2, b, b, c2, d); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    skyline.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: '#9FB3C2', roughness: 0.15, metalness: 0.6, side: THREE.DoubleSide }))); }
+  { const s = new THREE.Mesh(new THREE.CylinderGeometry(14, 30, 492, 4), glassT); s.rotation.y = Math.PI / 4; at(s, 1560, 2340, GZ + 246); }
+  { let z = GZ, rr = 26; for (let k = 0; k < 13; k++) { const h = 34 - k * 1.6; at(new THREE.Mesh(new THREE.CylinderGeometry(rr * 0.96, rr, h, 8), glassT), 1420, 2430, z + h / 2); z += h; rr *= 0.93; }
+    at(new THREE.Mesh(new THREE.CylinderGeometry(1.5, rr * 0.8, 40, 8), glassT), 1420, 2430, z + 20); }
+}
+const skyFog = new THREE.Fog('#C9D3DC', 400, 5200);
 /* ============================================================
    7. STATE: language, choices, furniture meshes, labels
    ============================================================ */
@@ -1677,7 +1732,8 @@ function renderPacks() {
   }));
 }
 const RENDERS = [
-  { f: 'renders/living_a.jpg', ko: '거실 · 현관에서 동쪽 창 방향', zh: '客厅 · 从玄关望向东侧落地窗' },
+  { f: 'renders/living_a.jpg', ko: '거실 · 북동쪽 코너 창 너머 루자쭈이', zh: '客厅 · 东北角落地窗外的陆家嘴' },
+  { f: 'renders/living_v.jpg', ko: '창밖 · 황푸강 건너 동방명주와 상하이타워', zh: '窗景 · 隔黄浦江望东方明珠与上海中心' },
   { f: 'renders/living_b.jpg', ko: '거실 · 소파 너머 다이닝과 아일랜드', zh: '客厅 · 越过沙发看餐厅与中岛' },
   { f: 'renders/living_c.jpg', ko: '다이닝 · 서양식 주방', zh: '餐厅 · 西厨' },
   { f: 'renders/master.jpg', ko: '마스터 침실', zh: '主卧' },
@@ -2023,6 +2079,7 @@ function enterWalk(x, z, yawOverride) {
     camera.rotation.order = 'YXZ';
     camera.fov = 62; camera.updateProjectionMatrix();
     stage.classList.add('walking'); walkbar.hidden = false; hint.hidden = true; editbar.hidden = true; man.g.visible = false;
+    skyline.visible = true; scene.fog = skyFog; scene.background = new THREE.Color('#BFD0E0'); ground.visible = false; camera.far = 12000; camera.updateProjectionMatrix();
     pressView('walk');
   } else if (yawOverride != null) yaw = yawOverride;
   walkTo(x, z);
@@ -2036,6 +2093,7 @@ function exitWalk() {
   buildWalls(wallsBeforeWalk);
   stage.classList.remove('walking'); walkbar.hidden = true; hint.hidden = false; renderEditbar();
   man.x = camera.position.x; man.z = camera.position.z; man.yaw = yaw; man.tween = null; placeMan(); man.g.visible = true; cursor.visible = false;
+  skyline.visible = false; scene.fog = null; ground.visible = true; applyTheme(); camera.far = 400; camera.updateProjectionMatrix();
 }
 document.getElementById('walk-exit').addEventListener('click', () => setView('overview'));
 function stepWalk(forward, strafe) {
