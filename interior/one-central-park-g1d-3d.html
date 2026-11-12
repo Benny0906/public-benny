@@ -1,9 +1,9 @@
 <title>壹號院 G1-D 가구 배치</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: full-height 3D stage on the left, spec sheet (selected piece, options, prices, schedule) on the right; stacks on phones. */
+/* Layout: full-height 3D stage on the left, spec sheet (plan, packages, selected piece with options, schedule) on the right; stacks on phones. */
 :root {
   --bg: #F2F2EF;
   --panel: #FBFBFA;
@@ -16,37 +16,39 @@
   --stage: #E6E7E3;
   --chip: #ECEBE7;
   --label-bg: rgba(251, 251, 250, 0.9);
-  --font-display: "Manrope", "Noto Sans KR", system-ui, sans-serif;
-  --font-body: "Noto Sans KR", "Manrope", "PingFang SC", system-ui, sans-serif;
+  --ok: #3E6B4A;
+  --font-display: "Manrope", "Noto Sans KR", "Noto Sans SC", system-ui, sans-serif;
+  --font-body: "Noto Sans KR", "Noto Sans SC", "Manrope", "PingFang SC", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #14171A; --panel: #1B1F23; --fg: #E8EBED; --muted: #9AA2A9; --line: #2D3338;
     --accent: #CDA770; --accent-ink: #17140F; --accent-soft: #2E2820; --stage: #20252A; --chip: #262B30;
-    --label-bg: rgba(27, 31, 35, 0.88); color-scheme: dark;
+    --label-bg: rgba(27, 31, 35, 0.88); --ok: #8CC09A; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #14171A; --panel: #1B1F23; --fg: #E8EBED; --muted: #9AA2A9; --line: #2D3338;
   --accent: #CDA770; --accent-ink: #17140F; --accent-soft: #2E2820; --stage: #20252A; --chip: #262B30;
-  --label-bg: rgba(27, 31, 35, 0.88); color-scheme: dark;
+  --label-bg: rgba(27, 31, 35, 0.88); --ok: #8CC09A; color-scheme: dark;
 }
 html, body { height: 100%; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 14px; line-height: 1.5; }
+:lang(zh) body, html[lang="zh"] body { font-family: "Noto Sans SC", var(--font-body); }
 * { box-sizing: border-box; }
-button { font: inherit; color: inherit; }
-button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button, input, select { font: inherit; color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 a { color: var(--accent); }
 
-.app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: auto minmax(0, 1fr); }
-.bar { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px;
-  padding-block: 14px 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; border-bottom: 1px solid var(--line); }
+.app { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 410px; grid-template-rows: auto minmax(0, 1fr); }
+.bar { grid-column: 1; grid-row: 1; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 20px;
+  padding-block: 12px 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; border-bottom: 1px solid var(--line); }
 .eyebrow { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; color: var(--muted); }
 h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.01em; margin: 2px 0 0; text-wrap: balance; }
-.controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
 .seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
-.seg button { border: 0; background: transparent; padding: 6px 11px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.seg button { border: 0; background: transparent; padding: 6px 10px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
 .seg button + button { border-left: 1px solid var(--line); }
 .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .seg button:hover:not([aria-pressed="true"]) { background: var(--chip); }
@@ -71,6 +73,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
 .rl { pointer-events: none; text-align: center; transform: translateY(-2px); }
 .rl b { display: block; font-family: var(--font-display); font-weight: 700; font-size: 12px; color: var(--fg); letter-spacing: 0.01em; }
 .rl span { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+.rl .py { font-family: var(--font-body); font-style: italic; font-size: 10px; color: var(--accent); }
 .rl.dim b { color: var(--muted); font-weight: 500; }
 .rl.changed b { color: var(--accent); }
 .walking .rl { display: none; }
@@ -82,27 +85,48 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
 .fl.sel i { color: var(--accent-ink); opacity: 0.8; }
 
 .side { grid-column: 2; grid-row: 1 / 3; border-left: 1px solid var(--line); background: var(--panel); overflow-y: auto; min-width: 0;
-  padding-block: 16px 28px; padding-left: 18px; padding-right: max(18px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 22px; }
+  padding-block: 14px 28px; padding-left: 18px; padding-right: max(18px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
 .sec-h { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+.langbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.plans { display: flex; flex-direction: column; gap: 8px; }
+.plan-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.plan-row select, .plan-row input { flex: 1 1 140px; min-width: 0; border: 1px solid var(--line); border-radius: 7px; padding: 6px 8px; background: var(--bg); }
+.btn { border: 1px solid var(--line); background: var(--bg); border-radius: 7px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.plan-status { font-size: 12px; color: var(--muted); }
+.plan-status.ok { color: var(--ok); }
+.packs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.pack { border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 8px 9px; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pack:hover { border-color: var(--muted); }
+.pack[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.pack b { font-size: 12.5px; }
+.pack span { font-family: var(--font-mono); font-size: 12px; }
+.pack small { font-size: 11px; color: var(--muted); }
 
 .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 15px; background: var(--bg); display: flex; flex-direction: column; gap: 11px; }
-.card .top { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.card .top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); }
 .pill.fixed { background: var(--accent); color: var(--accent-ink); }
 .pill.prop { background: var(--accent-soft); color: var(--accent); }
 .brand { font-family: var(--font-display); font-weight: 800; font-size: 20px; line-height: 1.2; }
 .model { font-size: 15px; font-weight: 500; }
-.kv { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 4px 10px; font-size: 12.5px; }
+.py { font-style: italic; color: var(--accent); font-size: 0.92em; }
+.kv { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 5px 10px; font-size: 12.5px; }
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; min-width: 0; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .price { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 3px; }
-.price .big { font-family: var(--font-display); font-weight: 800; font-size: 19px; font-variant-numeric: tabular-nums; }
-.price .big small { font-family: var(--font-body); font-weight: 500; font-size: 12px; color: var(--muted); margin-left: 6px; }
+.price .big { font-family: var(--font-display); font-weight: 800; font-size: 21px; font-variant-numeric: tabular-nums; }
+.price .big small { font-family: var(--font-mono); font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 6px; }
 .price .pnote { font-size: 12px; color: var(--muted); }
 .price .links { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12.5px; }
 .note { font-size: 13px; border-top: 1px solid var(--line); padding-top: 10px; }
+.shop { font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 2px; }
+.shop b { font-size: 12px; color: var(--muted); font-weight: 500; }
 .opts { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 10px; }
 .opts .h { font-size: 12px; color: var(--muted); }
 .opt { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; text-align: left; width: 100%;
@@ -114,6 +138,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
 .opt .t { font-weight: 700; font-size: 13px; min-width: 0; }
 .opt .t span { font-weight: 400; color: var(--muted); }
 .opt .p { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.opt .s { grid-column: 2 / 4; font-size: 11.5px; color: var(--muted); }
 
 .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .stat { border-top: 2px solid var(--fg); padding-top: 6px; min-width: 0; }
@@ -122,10 +147,10 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
 
 .room { border-top: 1px solid var(--line); padding-top: 10px; }
 .room + .room { margin-top: 12px; }
-.room-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.room-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
 .room-h b { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; }
 .room-h b em { font-style: normal; color: var(--accent); font-size: 11px; margin-left: 6px; }
-.room-h span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.room-h span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
 .items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 .items button { width: 100%; text-align: left; border: 0; background: transparent; border-radius: 7px; padding: 6px 8px; cursor: pointer;
   display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; align-items: baseline; }
@@ -148,6 +173,7 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
   .stage { height: 62svh; min-height: 360px; }
   .side { border-left: 0; border-top: 1px solid var(--line); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 }
+@media (max-width: 420px) { .packs { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 
@@ -155,33 +181,33 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
   <header class="bar">
     <div>
       <div class="eyebrow">上海壹號院 · G1-D · 335㎡ · 4房2厅4卫</div>
-      <h1>壹號院 G1-D 가구 배치</h1>
+      <h1 data-t="title">壹號院 G1-D 가구 배치</h1>
     </div>
     <div class="controls">
-      <div class="seg" role="group" aria-label="시점">
-        <button id="v-walk" class="walk" data-view="walk" aria-pressed="false">걷기</button>
-        <button id="v-overview" data-view="overview" aria-pressed="true">전체</button>
-        <button id="v-top" data-view="top" aria-pressed="false">평면</button>
-        <button id="v-living" data-view="living" aria-pressed="false">거실</button>
-        <button id="v-study" data-view="study" aria-pressed="false">서재</button>
-        <button id="v-master" data-view="master" aria-pressed="false">마스터</button>
-        <button id="v-closet" data-view="closet" aria-pressed="false">드레스룸</button>
+      <div class="seg" role="group" aria-label="view">
+        <button id="v-walk" class="walk" data-view="walk" aria-pressed="false"></button>
+        <button id="v-overview" data-view="overview" aria-pressed="true"></button>
+        <button id="v-top" data-view="top" aria-pressed="false"></button>
+        <button id="v-living" data-view="living" aria-pressed="false"></button>
+        <button id="v-study" data-view="study" aria-pressed="false"></button>
+        <button id="v-master" data-view="master" aria-pressed="false"></button>
+        <button id="v-closet" data-view="closet" aria-pressed="false"></button>
       </div>
-      <label class="toggle"><input type="checkbox" id="t-walls"> 벽 전체 높이</label>
-      <label class="toggle"><input type="checkbox" id="t-labels"> 브랜드 라벨 전부</label>
+      <label class="toggle"><input type="checkbox" id="t-walls"> <span data-t="wallsFull"></span></label>
+      <label class="toggle"><input type="checkbox" id="t-labels"> <span data-t="labelsAll"></span></label>
     </div>
   </header>
 
   <main class="stage" id="stage">
-    <div class="loading" id="loading">3D 모델 불러오는 중…</div>
+    <div class="loading" id="loading">3D …</div>
     <div class="css2d" id="css2d"></div>
     <div class="walkbar" id="walkbar" hidden>
-      <span><b>걷기 모드</b> · 더블클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤</span>
-      <button id="walk-exit" type="button">전체 보기로</button>
+      <span data-t="walkbar"></span>
+      <button id="walk-exit" type="button" data-t="walkExit"></button>
     </div>
     <div class="toast" id="toast" hidden></div>
-    <div class="hint" id="hint"><b>더블클릭</b>: 그 자리로 걸어 들어가기 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션</div>
-    <svg class="compass" viewBox="0 0 42 42" aria-label="북쪽 표시">
+    <div class="hint" id="hint" data-t="hint"></div>
+    <svg class="compass" viewBox="0 0 42 42" aria-label="N">
       <circle cx="21" cy="21" r="19" fill="var(--label-bg)" stroke="var(--line)"></circle>
       <path d="M21 7 L26 23 L21 20 L16 23 Z" fill="var(--fg)"></path>
       <text x="21" y="35" text-anchor="middle" font-size="9" font-family="IBM Plex Mono, monospace" fill="var(--muted)">N</text>
@@ -189,22 +215,43 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
   </main>
 
   <aside class="side">
+    <section class="langbar">
+      <div class="seg" role="group" aria-label="language">
+        <button id="lang-ko" data-lang="ko" aria-pressed="true">한국어</button>
+        <button id="lang-zh" data-lang="zh" aria-pressed="false">中文</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="t-pinyin"> <span data-t="pinyin"></span></label>
+    </section>
     <section>
-      <h2 class="sec-h">선택한 가구</h2>
+      <h2 class="sec-h" data-t="planH"></h2>
+      <div class="plans">
+        <div class="plan-row">
+          <select id="plan-select" aria-label="plan"></select>
+          <button class="btn" id="plan-rename" type="button" data-t="rename"></button>
+        </div>
+        <div class="plan-row">
+          <input id="plan-name" type="text" maxlength="40" autocomplete="off">
+          <button class="btn primary" id="plan-save" type="button" data-t="saveNew"></button>
+        </div>
+        <div class="plan-status" id="plan-status"></div>
+      </div>
+    </section>
+    <section>
+      <h2 class="sec-h" data-t="packH"></h2>
+      <div class="packs" id="packs"></div>
+    </section>
+    <section>
+      <h2 class="sec-h" data-t="selectedH"></h2>
       <div class="card" id="detail"></div>
     </section>
     <section>
       <div class="stats" id="stats"></div>
     </section>
     <section>
-      <h2 class="sec-h">공간별 가구 스케줄</h2>
+      <h2 class="sec-h" data-t="scheduleH"></h2>
       <div id="schedule"></div>
     </section>
-    <section class="foot">
-      <p><b>가격 기준</b>: 2026년 11월 조회 시점의 공개 리테일가(브랜드 공식몰 또는 공인 리테일러)입니다. 할인가가 아니라 정가 기준이고 세금, 배송, 중국 수입관세는 포함하지 않았습니다. 상하이 매장 가격은 보통 이보다 높습니다.</p>
-      <p><b>달러 환산</b>은 1 EUR ≈ 1.10 USD, 1 GBP ≈ 1.30 USD, 1 SGD ≈ 0.77 USD로 가정했습니다. 견적 품목(맞춤 수납, 주방 등)은 합계에서 빠져 있습니다.</p>
-      <p>평면 치수는 분양 도면(외곽 18.0 × 25.6 m) 기준이고, 내벽 위치는 ±10 cm 수준의 추정치입니다. 가구 치수는 각 브랜드 대표 사양입니다.</p>
-    </section>
+    <section class="foot" id="foot"></section>
   </aside>
 </div>
 
@@ -226,28 +273,28 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
    1. FLOOR PLAN DATA  (plan mm; x → east, y → south; origin = NW corner of 18000 × 25600 envelope)
    ============================================================ */
 const ROOMS = [
-  { id: 'balcony', ko: '발코니', zh: '阳台', area: 5.46, rects: [[0,0,3600,1800]], floor: 'stoneDark', ext: { N: 'rail', W: 'rail' }, corner: { c: 'TL', r: 1200 }, label: [1800, 380] },
-  { id: 'bed4', ko: '게스트 침실', zh: '次卧', area: 14.54, rects: [[0,1800,3600,5650],[3600,3800,5000,5650]], floor: 'oak', ext: { W: 'glass' }, label: [1700, 2700] },
-  { id: 'equip', ko: '설비실', zh: '设备间', area: 5.93, rects: [[3600,0,7250,1800]], floor: 'tile', ext: { N: 'wall' }, label: [5300, 1250] },
-  { id: 'bath1', ko: '욕실 1', zh: '卫生间', area: 5.19, rects: [[3600,1800,6400,3800]], floor: 'tile', label: [5200, 3100] },
+  { id: 'balcony', ko: '발코니', zh: '阳台', py: 'yángtái', area: 5.46, rects: [[0,0,3600,1800]], floor: 'stoneDark', ext: { N: 'rail', W: 'rail' }, corner: { c: 'TL', r: 1200 }, label: [1800, 380] },
+  { id: 'bed4', ko: '게스트 침실', zh: '次卧', py: 'cìwò', area: 14.54, rects: [[0,1800,3600,5650],[3600,3800,5000,5650]], floor: 'oak', ext: { W: 'glass' }, label: [1700, 2700] },
+  { id: 'equip', ko: '설비실', zh: '设备间', py: 'shèbèijiān', area: 5.93, rects: [[3600,0,7250,1800]], floor: 'tile', ext: { N: 'wall' }, label: [5300, 1250] },
+  { id: 'bath1', ko: '욕실 1', zh: '卫生间', py: 'wèishēngjiān', area: 5.19, rects: [[3600,1800,6400,3800]], floor: 'tile', label: [5200, 3100] },
   { id: 'shaft1', solid: true, rects: [[6400,1800,7250,3800]] },
-  { id: 'kitchen', ko: '중식 주방', zh: '厨房', area: 14.74, rects: [[7250,0,11300,3800]], floor: 'stoneDark', ext: { N: 'wall' }, label: [8400, 3250] },
+  { id: 'kitchen', ko: '중식 주방', zh: '中厨', py: 'zhōngchú', area: 14.74, rects: [[7250,0,11300,3800]], floor: 'stoneDark', ext: { N: 'wall' }, label: [8400, 3250] },
   { id: 'col1', solid: true, rects: [[11300,0,11600,3800]] },
-  { id: 'family', ko: '서재', zh: '书房 · 原家庭活动室', area: 10.92, rects: [[11600,0,14600,3800]], floor: 'oak', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1200 }, label: [13200, 3350], changed: true },
-  { id: 'corrN', ko: '복도', zh: '走道', area: 11.16, rects: [[5000,3800,9450,5650],[9450,3800,14000,4350]], floor: 'marble', label: [7300, 4750] },
+  { id: 'family', ko: '서재', zh: '书房', py: 'shūfáng', area: 10.92, rects: [[11600,0,14600,3800]], floor: 'oak', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1200 }, label: [13200, 3350], changed: true },
+  { id: 'corrN', ko: '복도', zh: '走道', py: 'zǒudào', area: 11.16, rects: [[5000,3800,9450,5650],[9450,3800,14000,4350]], floor: 'marble', label: [7300, 4750] },
   { id: 'col2', solid: true, rects: [[14000,3800,14600,4350]] },
-  { id: 'living', ko: '거실 · 다이닝 · 서양식 주방', zh: '客厅 · 餐厅 · 西厨', area: 65.10, rects: [[9450,4350,17200,12000],[11550,12000,17200,14650]], floor: 'marble', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1500 }, label: [13000, 9400] },
-  { id: 'core', ko: '공용 코어', zh: '楼梯 · 电梯', rects: [[0,5650,9450,11000],[0,11000,6450,16750]], floor: 'core', ext: {}, label: [2300, 10200], dim: true },
-  { id: 'lift', ko: '전용 엘리베이터 홀', zh: '电梯厅', area: 13.69, rects: [[6450,11000,9450,12000],[6450,12000,9050,16750]], floor: 'marble', label: [7700, 12600] },
-  { id: 'foyer', ko: '현관', zh: '玄关', area: 5.35, rects: [[9050,12000,11550,14650]], floor: 'marble', label: [10300, 13100] },
-  { id: 'bath2', ko: '게스트 욕실', zh: '卫生间', area: 5.28, rects: [[9050,14650,11550,16750]], floor: 'tile', label: [10700, 15250] },
-  { id: 'corrS', ko: '복도', zh: '走道', area: 8.45, rects: [[8700,16750,12850,18500],[11550,14650,12850,16750]], floor: 'oak', label: [10800, 17600] },
-  { id: 'bath3', ko: '욕실 3', zh: '卫生间', area: 5.63, rects: [[6450,16750,8700,20250]], floor: 'tile', ext: { W: 'wall' }, label: [7800, 17300] },
-  { id: 'bed3', ko: '침실 3', zh: '次卧', area: 19.89, rects: [[6450,20250,10350,25600],[8700,18500,10350,20250]], floor: 'oak', ext: { W: 'wall', S: 'glass', E: 'glass' }, corner: { c: 'BR', r: 1200 }, label: [8100, 21000] },
-  { id: 'bed2', ko: '아내 드레스룸', zh: '衣帽间 · 原次卧', area: 13.79, rects: [[10350,18500,13600,23300]], floor: 'oak', ext: { S: 'glass' }, label: [11975, 19150], changed: true },
-  { id: 'cloak', ko: '마스터 드레스룸', zh: '衣帽间', rects: [[12850,14650,14700,18500]], floor: 'oak', label: [13780, 17750] },
-  { id: 'mbath', ko: '마스터 욕실', zh: '主卫', area: 9.06, rects: [[14700,14650,18000,18500]], floor: 'tile', ext: { N: 'wall', E: 'wall' }, label: [16000, 16700] },
-  { id: 'master', ko: '마스터 침실', zh: '主卧', area: 23.97, rects: [[13600,18500,18000,23300]], floor: 'oak', ext: { E: 'glass', S: 'glass' }, corner: { c: 'BR', r: 1500 }, label: [16700, 21400] },
+  { id: 'living', ko: '거실 · 다이닝 · 서양식 주방', zh: '客厅 · 餐厅 · 西厨', py: 'kètīng · cāntīng · xīchú', area: 65.10, rects: [[9450,4350,17200,12000],[11550,12000,17200,14650]], floor: 'marble', ext: { N: 'glass', E: 'glass' }, corner: { c: 'TR', r: 1500 }, label: [13000, 9400] },
+  { id: 'core', ko: '공용 코어', zh: '楼梯 · 电梯', py: 'lóutī · diàntī', rects: [[0,5650,9450,11000],[0,11000,6450,16750]], floor: 'core', ext: {}, label: [2300, 10200], dim: true },
+  { id: 'lift', ko: '전용 엘리베이터 홀', zh: '电梯厅', py: 'diàntītīng', area: 13.69, rects: [[6450,11000,9450,12000],[6450,12000,9050,16750]], floor: 'marble', label: [7700, 12600] },
+  { id: 'foyer', ko: '현관', zh: '玄关', py: 'xuánguān', area: 5.35, rects: [[9050,12000,11550,14650]], floor: 'marble', label: [10300, 13100] },
+  { id: 'bath2', ko: '게스트 욕실', zh: '客卫', py: 'kèwèi', area: 5.28, rects: [[9050,14650,11550,16750]], floor: 'tile', label: [10700, 15250] },
+  { id: 'corrS', ko: '복도', zh: '走道', py: 'zǒudào', area: 8.45, rects: [[8700,16750,12850,18500],[11550,14650,12850,16750]], floor: 'oak', label: [10800, 17600] },
+  { id: 'bath3', ko: '욕실 3', zh: '卫生间', py: 'wèishēngjiān', area: 5.63, rects: [[6450,16750,8700,20250]], floor: 'tile', ext: { W: 'wall' }, label: [7800, 17300] },
+  { id: 'bed3', ko: '침실 3', zh: '次卧', py: 'cìwò', area: 19.89, rects: [[6450,20250,10350,25600],[8700,18500,10350,20250]], floor: 'oak', ext: { W: 'wall', S: 'glass', E: 'glass' }, corner: { c: 'BR', r: 1200 }, label: [8100, 21000] },
+  { id: 'bed2', ko: '아내 드레스룸', zh: '夫人衣帽间', py: 'fūrén yīmàojiān', area: 13.79, rects: [[10350,18500,13600,23300]], floor: 'oak', ext: { S: 'glass' }, label: [11975, 19150], changed: true },
+  { id: 'cloak', ko: '마스터 드레스룸', zh: '主卧衣帽间', py: 'zhǔwò yīmàojiān', rects: [[12850,14650,14700,18500]], floor: 'oak', label: [13780, 17750] },
+  { id: 'mbath', ko: '마스터 욕실', zh: '主卫', py: 'zhǔwèi', area: 9.06, rects: [[14700,14650,18000,18500]], floor: 'tile', ext: { N: 'wall', E: 'wall' }, label: [16000, 16700] },
+  { id: 'master', ko: '마스터 침실', zh: '主卧', py: 'zhǔwò', area: 23.97, rects: [[13600,18500,18000,23300]], floor: 'oak', ext: { E: 'glass', S: 'glass' }, corner: { c: 'BR', r: 1500 }, label: [16700, 21400] },
 ];
 const OPEN = [['corrN','living'], ['family','corrN'], ['living','foyer'], ['living','corrS']];
 const DOORS = [
@@ -257,262 +304,397 @@ const DOORS = [
 ];
 
 /* ============================================================
-   2. FURNITURE OPTIONS (slots) — prices are public retail list prices found Nov 2026
+   2. LANGUAGE
    ============================================================ */
-const FX = { USD: 1, EUR: 1.10, GBP: 1.30, SGD: 0.77 };
-const SYM = { USD: '$', EUR: '€', GBP: '£', SGD: 'S$' };
-const EAMES = { brand: 'Vitra', model: 'Eames Lounge Chair & Ottoman', designer: 'Charles & Ray Eames', type: 'eames', dims: [84, 140, 84], c1: '#1E1C1B', c2: '#5B3A26',
-  price: { v: 8775, cur: 'EUR', note: 'Salvioni 시작가(블랙 애쉬 쉘 · 패브릭). 가죽·월넛은 €10,000+' }, url: 'https://salvioniarredamenti.it/en/products/vitra-eames-lounge-chair-ottoman' };
-const EGG = { brand: 'Fritz Hansen', model: 'Egg Chair (가죽)', designer: 'Arne Jacobsen', type: 'armchair', style: 'egg', dims: [86, 95, 107], c1: '#6E3B2A', c2: '#C8CCCF',
-  price: { v: 10499, cur: 'EUR', note: 'Finnish Design Shop 정가, Essential 가죽 기준' }, url: 'https://www.finnishdesignshop.com/en-at/product/egg-lounge-chair-black-leather-essential-black' };
-const FRED = { brand: 'Poltrona Frau', model: 'Fred Desk', designer: 'Neri&Hu', type: 'deskWood', dims: [137, 67, 71], c1: '#8A5A3B', c2: '#3A2B22',
-  price: { v: 7980, cur: 'GBP', note: 'Aram 런던, 새들 엑스트라 가죽 상판' }, url: 'https://www.aram.co.uk/products/fred-desk-top-in-saddle-extra-leather-camel' };
-const PEEK = { brand: 'Poltrona Frau', model: 'Peek-a-Book Desk', designer: 'Roberto Lazzeroni', type: 'deskWood', style: 'hutch', dims: [160, 70, 100], c1: '#5B3A26', c2: '#2E241E',
-  price: { v: 10639, cur: 'EUR', note: 'Poltrona Frau 이탈리아 공식 시작가. 치수는 추정치' }, url: 'https://www.poltronafrau.com/it/en/products/peek-a-book-desk.html' };
-
-const SLOTS = {
-  sofa: { label: '거실 소파', options: [
-    { brand: 'Living Divani', model: 'Extra Soft', designer: 'Piero Lissoni', type: 'sofaL', dims: [380, 300, 72], c1: '#C4BBAD', c2: '#ADA394', fixed: true,
-      price: { v: 19500, cur: 'EUR', note: 'Tomassini 가죽 구성 정가 예시. L자 모듈 수에 따라 달라져서 최종가는 견적' }, url: 'https://www.tomassini.com/en/living-divani-extrasoft-rust-leather-sofa-expo-offer-p-8585.html',
-      why: 'TV 벽을 정면으로 보고 동쪽 270° 창을 오른쪽에 두는 L 구성입니다. 등받이가 다이닝과 거실의 경계가 됩니다.' },
-    { brand: 'B&B Italia', model: 'Camaleonda', designer: 'Mario Bellini', type: 'sofaL', dims: [360, 280, 72], c1: '#B48C64', c2: '#9C7A58',
-      price: { v: 12290, cur: 'EUR', note: 'Tomassini 패브릭 구성 예시. 구성별 €9,000~€14,000+, 가죽은 더 높음' }, url: 'https://www.tomassini.com/en/bb-italia-camaleonda-beige-sofa-p-9116.html',
-      why: '비교용 대안입니다. 버튼 퀼팅 모듈이라 Extra Soft보다 시각적 존재감이 강합니다.' },
-  ] },
-  coffee: { label: '커피 테이블', options: [
-    { brand: 'Cassina', model: 'LC10-P', designer: 'Le Corbusier · P. Jeanneret · C. Perriand', type: 'coffee', dims: [120, 120, 33], c1: '#C9CDD0', c2: '#2A2D30',
-      price: { v: 4360, cur: 'USD', note: 'Hive Modern 사이즈별 $2,335~$4,360 (120 cm급은 상단)' }, url: 'https://www.hivemodern.com/pages/product1143/le-corbusier-lc10-p-low-table-cassina',
-      why: 'Extra Soft는 좌면이 낮아서 낮은 유리 상판이 시선을 덜 막습니다.' },
-    { brand: 'Knoll', model: 'Saarinen Coffee Table 라운드 (대리석)', designer: 'Eero Saarinen', type: 'tulip', dims: [107, 107, 39], c1: '#EDEBE6', c2: '#F2F2F0',
-      price: { v: 3119, cur: 'USD', note: 'Design Within Reach 라운드 정가. 42" 석재 상판은 상품 페이지에서 확인' }, url: 'https://www.dwr.com/living-accent-coffee-tables/saarinen-coffee-table-round/100303525.html',
-      why: '대리석 바닥과 톤이 맞고, 원형이라 L 소파 안쪽 동선이 부드럽습니다.' },
-  ] },
-  lounge: { label: '거실 라운지 체어', options: [
-    { brand: 'Poltrona Frau', model: 'Archibald', designer: 'Jean-Marie Massaud', type: 'armchair', style: 'archibald', dims: [96, 90, 75], c1: '#8A5A3B',
-      price: { v: 4700, cur: 'EUR', note: 'Tomassini 기준 €4,700~€6,000+ (가죽 등급별)' }, url: 'https://tomassini.com/en/poltrona-frau-archibald-armchair-p-1777.html',
-      why: '소파 반대편을 닫아 대화 동선을 만듭니다. 코냑 가죽이 소파 패브릭과 대비됩니다.' },
-    EGG, EAMES,
-  ] },
-  arco: { label: '플로어 램프', options: [
-    { brand: 'Flos', model: 'Arco', designer: 'Achille & Pier Giacomo Castiglioni', type: 'arco', dims: [42, 215, 250], c1: '#E8E5E0', c2: '#C8CCCF',
-      price: { v: 2878, cur: 'EUR', note: 'Finnish Design Shop EU 정가' }, url: 'https://www.finnishdesignshop.com/en-ax/product/arco-floor-lamp' },
-  ] },
-  tv: { label: 'TV', options: [
-    { brand: 'Bang & Olufsen', model: 'Beovision Harmony 77"', designer: '', type: 'tv', dims: [172, 25, 100], c1: '#151618', c2: '#8C7A62',
-      price: { v: 21150, cur: 'EUR', note: 'B&O 독일 공식 라인업 시작가(65"). 77"은 매장 확인' }, url: 'https://www.bang-olufsen.com/de/tv-geraete/beovision-harmony' },
-  ] },
-  speaker: { label: '스피커', per: 'set', options: [
-    { brand: 'Bang & Olufsen', model: 'Beolab 28 (1쌍)', designer: '', type: 'speaker', dims: [20, 20, 125], c1: '#2B2C2E',
-      price: { v: 14750, cur: 'USD', note: '미국 권장가(1쌍, 패브릭 그릴). 우드 그릴은 $16,500' }, url: 'https://www.engadget.com/bang-and-olufsen-beolab28-speaker-070031085.html' },
-  ] },
-  diningTable: { label: '다이닝 테이블', options: [
-    { brand: 'Molteni&C', model: 'Arc Ø180', designer: 'Foster + Partners', type: 'tableRound', dims: [180, 180, 74], c1: '#AEB9B6', c2: '#A39C92',
-      price: { v: 7395, cur: 'USD', note: 'Molteni&C 미국 공식몰 Arc 시작가. Ø180·대리석 상판은 견적' }, url: 'https://shop.molteni.it/collections/molteni-c-products-by-foster-partners',
-      why: '원형 6인석이라 270° 창 쪽 시야를 막지 않습니다. 북·동쪽 유리에서 1 m 이상 띄웠습니다.' },
-    { brand: 'Knoll', model: 'Saarinen Dining Table 라운드 (대리석)', designer: 'Eero Saarinen', type: 'tulip', dims: [152, 152, 72], c1: '#EDEBE6', c2: '#F2F2F0',
-      price: { v: 9978, cur: 'USD', note: 'Design Within Reach 라운드 $3,120~$9,978 (사이즈·상판별, 상단값 적용)' }, url: 'https://www.dwr.com/kitchen-dining-tables/saarinen-dining-table-round/100301199.html' },
-    { brand: 'B&B Italia', model: 'Tobi-Ishi Ø160', designer: 'Edward Barber & Jay Osgerby', type: 'tobi', dims: [160, 160, 73], c1: '#3C3A37', c2: '#3C3A37',
-      price: { v: 5995, cur: 'GBP', note: 'Innes 런던, Ø160 새틴 래커 정가' }, url: 'https://innes.co.uk/products/bb-italia-t160-tobi-ishi-round-dining-table' },
-  ] },
-  diningChair: { label: '다이닝 체어', options: [
-    { brand: 'Cassina', model: 'Cab 412', designer: 'Mario Bellini', type: 'chair', dims: [47, 52, 82], c1: '#2F2925',
-      price: { v: 1567, cur: 'EUR', note: 'Salvioni 개당 시작가(새들 가죽, 팔걸이 없음)' }, url: 'https://salvioniarredamenti.it/en/products/cassina-cab-chair' },
-  ] },
-  pendant: { label: '다이닝 펜던트', options: [
-    { brand: 'Bocci', model: '28.7 Cluster', designer: 'Omer Arbel', type: 'pendant', dims: [120, 120, 60], c1: '#F4E6C8',
-      price: { v: 5950, cur: 'USD', note: 'Hive Modern $5,950~$8,225 (캐노피 마감·전구별)' }, url: 'https://hivemodern.com/pages/product9494/28.7-cluster-seven-pendant-chandelier-omer-arbel-bocci' },
-  ] },
-  masterBed: { label: '마스터 침대', options: [
-    { brand: 'Hästens', model: 'Vividus', designer: 'Ferris Rafauli', type: 'bed', style: 'tall', dims: [215, 230, 120], c1: '#EEECE8', c2: '#2F4A6E',
-      price: { v: 189000, cur: 'USD', note: '보도 기준 $140,000~$189,000 (2016~2018). 현재가는 Hästens 매장 견적' }, url: 'https://www.hastens.com/',
-      why: '머리는 서쪽 벽, 발끝은 동·남쪽 곡면 유리를 향합니다. 아침 햇빛이 얼굴로 바로 들지 않습니다.' },
-    { brand: 'Poliform', model: 'Dream Bed 180×200', designer: 'Marcel Wanders', type: 'bed', dims: [210, 230, 105], c1: '#EEECE8', c2: '#8F887F',
-      price: { v: 9485, cur: 'SGD', note: 'Space Furniture 싱가포르, 패브릭 정가' }, url: 'https://www.spacefurniture.com.sg/products/poliform-dream-bed' },
-  ] },
-  studyDesk: { label: '서재 책상', options: [
-    { brand: 'USM', model: 'Haller Table 175×75', designer: 'Fritz Haller', type: 'desk', dims: [175, 75, 74], c1: '#F2F1EE', c2: '#C8CCCF',
-      price: { v: 1557, cur: 'USD', note: 'MOHD 정가(펄 그레이 라미네이트)' }, url: 'https://shop.mohd.it/en/haller-laminate-table-l-175-cm-p-75-cm-pearl-grey.html',
-      why: '창을 등지지도 마주하지도 않게 서쪽 벽에 붙였습니다. 북쪽 창빛이 옆에서 들어와 모니터에 반사가 생기지 않습니다.' },
-    FRED, PEEK,
-  ] },
-  studyChair: { label: '서재 의자', options: [
-    { brand: 'Vitra', model: 'Aluminium Chair EA 119', designer: 'Charles & Ray Eames', type: 'officeChair', dims: [65, 70, 105], c1: '#2A2826', c2: '#C8CCCF',
-      price: { v: 3350, cur: 'EUR', note: 'smow 정가' }, url: 'https://www.smow.com/a/VT-268-000' },
-    { brand: 'Herman Miller', model: 'Embody', designer: 'Bill Stumpf · Jeff Weber', type: 'officeChair', dims: [70, 70, 105], c1: '#2B2D2F', c2: '#3A3C3E',
-      price: { v: 2255, cur: 'USD', note: 'Herman Miller 공식 스토어 정가' }, url: 'https://store.hermanmiller.com/Products/Embody-Chair',
-      why: '장시간 작업이 많으면 디자인보다 인체공학이 우선입니다.' },
-  ] },
-  studyShelf: { label: '서재 선반', options: [
-    { brand: 'Vitsœ', model: '606 Universal Shelving', designer: 'Dieter Rams', type: 'shelf606', dims: [165, 36, 220], c1: '#E9E8E4', c2: '#9A9DA0',
-      price: { v: 5856, cur: 'GBP', note: 'Vitsœ 영국 책장+캐비닛 구성 예시 £5,856~£6,213' }, url: 'https://www.vitsoe.com/gb/606' },
-  ] },
-  tech: { label: '워크스테이션', options: [
-    { brand: 'Apple', model: 'Mac Studio (M5 Max) + Studio Display XDR', designer: '', type: 'workstation', dims: [70, 25, 50], c1: '#1B1C1E', c2: '#B9BCBE',
-      price: { v: 5798, cur: 'USD', note: '미국 시작가 Mac Studio $2,499 + Studio Display XDR $3,299' }, url: 'https://www.apple.com/mac-studio/' },
-  ] },
-  studyLounge: { label: '서재 리딩 체어', options: [
-    { ...EAMES, why: '북동쪽 곡면 유리를 바라보는 독서 자리입니다. 오토만이 창 쪽을 향합니다.' }, EGG,
-  ] },
-  closet: { label: '드레스룸 수납 시스템', per: 'set', options: [
-    { brand: 'Poliform', model: 'Senzafine 유리 도어 워크인', designer: '', type: 'cabinet', style: 'glass', c1: '#3B3029', c2: '#B29C82',
-      price: { v: null, note: '맞춤 견적. 공식 정가 비공개' }, url: 'https://www.poliform.it/en/products/senzafine/',
-      why: '양쪽 벽 전체를 브론즈 유리 도어 수납으로 채웠습니다. 문을 열지 않아도 옷이 보이고 먼지는 막힙니다.' },
-    { brand: 'Rimadesio', model: 'Zenit 워크인', designer: '', type: 'cabinet', style: 'glass', c1: '#5A5A58', c2: '#C4B8A8',
-      price: { v: null, note: '맞춤 견적. 리드타임 약 6~8주' }, url: 'https://www.ciatdesign.com/en/zenit-walk-in-closet-rimadesio.html' },
-    { brand: 'Molteni&C', model: 'Gliss Master 워크인', designer: 'Vincent Van Duysen', type: 'cabinet', style: 'glass', c1: '#6A5A4A', c2: '#CDBFA9',
-      price: { v: null, note: '맞춤 견적. 플래그십 전시품 정가 €34,513 참고' }, url: 'https://shop.mohd.it/en/gliss-master-walk-in-closet.html' },
-  ] },
-  closetIsland: { label: '드레스룸 아일랜드', options: [
-    { brand: 'Poliform', model: 'Senzafine 아일랜드 서랍장 (유리 상판)', designer: '', type: 'island', style: 'glass', dims: [160, 80, 90], c1: '#3B3029', c2: '#8C6E58',
-      price: { v: null, note: '맞춤 견적' }, url: 'https://www.spacefurniture.com.sg/products/poliform-senzafine-island-chest-of-drawers',
-      why: '유리 상판 아래에 시계, 주얼리, 선글라스를 진열합니다. 양쪽 수납과 62 cm 통로를 남겼습니다.' },
-  ] },
-  dressing: { label: '화장대', options: [
-    { ...PEEK, type: 'dressing', why: '남쪽 유리 앞에 둬서 낮에는 자연광으로 화장합니다. 상부 칸에 화장품이 들어갑니다.' },
-    { ...FRED, type: 'dressing' },
-  ] },
-  closetChair: { label: '드레스룸 체어', options: [
-    { brand: 'Poltrona Frau', model: 'Vanity Fair XC', designer: 'Renzo Frau (1930)', type: 'armchair', style: 'vanity', dims: [86, 90, 92], c1: '#8E2F27', c2: '#3A2B22',
-      price: { v: 6027, cur: 'EUR', note: 'Salvioni 패브릭 시작가. 가죽은 상향' }, url: 'https://www.salvioniarredamenti.it/en/products/poltrona-frau-vanity-fair-armchair/' },
-  ] },
-  mirror: { label: '전신 거울', options: [
-    { brand: 'FIAM', model: 'Caadre 스탠딩 미러', designer: 'Philippe Starck', type: 'mirror', dims: [85, 35, 196], c1: '#DCE3E6',
-      price: { v: 3368, cur: 'EUR', note: 'DesignItaly 주문 제작가' }, url: 'https://designitaly.com/products/mirror-caadre-large-philippe-starck-for-fiam' },
-  ] },
-  bed3Bed: { label: '침실 3 침대', options: [
-    { brand: 'Poliform', model: 'Dream Bed 180×200', designer: 'Marcel Wanders', type: 'bed', dims: [200, 225, 105], c1: '#BDB7AF', c2: '#8F887F',
-      price: { v: 9485, cur: 'SGD', note: 'Space Furniture 싱가포르, 패브릭 정가' }, url: 'https://www.spacefurniture.com.sg/products/poliform-dream-bed' },
-  ] },
+const T = {
+  ko: {
+    title: '壹號院 G1-D 가구 배치', walk: '걷기', overview: '전체', top: '평면', living: '거실', study: '서재', master: '마스터', closet: '드레스룸',
+    wallsFull: '벽 전체 높이', labelsAll: '브랜드 라벨 전부', pinyin: '병음 표시',
+    walkbar: '<b>걷기 모드</b> · 더블클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤', walkExit: '전체 보기로',
+    hint: '<b>더블클릭</b>: 그 자리로 걸어 들어가기 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션',
+    toastWall: '벽이나 창 밖으로는 나갈 수 없어요', toastFloor: '바닥이나 가구 쪽을 더블클릭하세요',
+    planH: '안 (공유 저장)', rename: '이름 바꾸기', saveNew: '현재 선택을 새 안으로 저장', planPlaceholder: '새 안 이름 (예: A안 · 아내 의견 반영)',
+    planLocal: '이 기기에만 저장 중', planNone: '저장된 안 없음 · 지금 선택은 이 기기에만 저장됩니다', planShared: '공유 저장됨 · 같은 링크를 연 사람 모두 같은 안을 봅니다',
+    planReadOnly: '보기 전용 권한이라 안을 저장할 수 없습니다', planSaving: '저장 중…', planLoading: '저장된 안 불러오는 중…', planOffline: '공유 저장소에 연결하지 못해 이 기기에만 저장합니다',
+    planDefault: '이 기기 선택', packH: '예산별 패키지 · 버튼 하나로 전체 교체', packKeep: '소파는 확정한 Extra Soft 유지',
+    selectedH: '선택한 가구', scheduleH: '공간별 가구 스케줄', fixed: '확정', prop: '제안', optCount: n => `옵션 ${n}`,
+    designer: '디자이너', dims: '치수', where: '위치', material: '소재·마감', lead: '리드타임', shop: '상하이 매장', shopNone: '상하이 매장 정보 미확인 · 브랜드 공식 사이트에서 확인',
+    quote: '견적', quoteSub: '공개 정가 없음', noPrice: '가격 미조사 · 매장 문의', perUnit: '개당', link: '상품 · 가격 페이지 ↗', mapSearch: '지도 검색어',
+    optH: (label, n) => `${label} 옵션 ${n}개 · 고르면 3D와 합계가 바로 바뀝니다`,
+    statTotal: '공개가 합계 (원화)', statQuote: '견적 품목 (합계 제외)', statCount: (n, b) => `배치 가구 수 · 브랜드 ${b}개`, changedRoom: '용도 변경', times: '×',
+    foot: [
+      '<b>가격 기준</b>: 2026년 11월 조회한 공개 리테일 정가입니다(브랜드 공식몰 또는 공인 리테일러). 세금, 배송, 중국 수입관세는 빠져 있고 상하이 매장가는 보통 더 높습니다.',
+      '<b>환율</b>: 2026-11-12 기준 USD 1,343.3원 · EUR 1,500.5원 · GBP 1,793.0원(코리안투데이 집계). SGD는 USD 0.77로 가정했습니다(≈1,034원).',
+      '맞춤 수납(Poliform·Rimadesio·Molteni&C)과 주방(Boffi·Bulthaup)은 공개 정가가 없어 합계에서 빠져 있습니다. 실제 총액은 이보다 큽니다.',
+      '평면 치수는 분양 도면(외곽 18.0 × 25.6 m) 기준이고 내벽 위치는 ±10 cm 수준의 추정치입니다. 3D 형상은 2단계에서 정교화합니다.',
+    ],
+  },
+  zh: {
+    title: '壹號院 G1-D 家具布置', walk: '漫游', overview: '全景', top: '平面', living: '客厅', study: '书房', master: '主卧', closet: '衣帽间',
+    wallsFull: '墙体全高', labelsAll: '显示全部品牌', pinyin: '显示拼音',
+    walkbar: '<b>漫游模式</b> · 双击：移动到该位置 · 拖动：环视 · 滚轮 / W·S：前后移动', walkExit: '返回全景',
+    hint: '<b>双击</b>：走进该位置 · 拖动：旋转 · 滚轮：缩放 · 点击家具：详情与选项',
+    toastWall: '无法穿过墙体或窗户', toastFloor: '请双击地面或家具附近',
+    planH: '方案（共享保存）', rename: '重命名', saveNew: '将当前选择保存为新方案', planPlaceholder: '新方案名称（例：A 方案 · 夫人意见）',
+    planLocal: '仅保存在本设备', planNone: '尚无保存的方案 · 当前选择仅保存在本设备', planShared: '已共享保存 · 打开同一链接的人都能看到',
+    planReadOnly: '您只有查看权限，无法保存方案', planSaving: '保存中…', planLoading: '正在加载已保存的方案…', planOffline: '无法连接共享存储，仅保存在本设备',
+    planDefault: '本设备的选择', packH: '预算套餐 · 一键整体替换', packKeep: '沙发保留已确定的 Extra Soft',
+    selectedH: '已选家具', scheduleH: '各空间家具清单', fixed: '已确定', prop: '建议', optCount: n => `${n} 个选项`,
+    designer: '设计师', dims: '尺寸', where: '位置', material: '材质与饰面', lead: '交货期', shop: '上海门店', shopNone: '上海门店信息未确认 · 请查询品牌官网',
+    quote: '询价', quoteSub: '无公开定价', noPrice: '价格未调查 · 请向门店询价', perUnit: '单价', link: '产品与价格页面 ↗', mapSearch: '地图搜索词',
+    optH: (label, n) => `${label}：${n} 个选项 · 选择后 3D 与合计立即更新`,
+    statTotal: '公开价合计（韩元）', statQuote: '需询价项目（未计入）', statCount: (n, b) => `家具件数 · 品牌 ${b} 个`, changedRoom: '用途变更', times: '×',
+    foot: [
+      '<b>价格依据</b>：2026 年 11 月查询的公开零售价（品牌官网或授权零售商），不含税费、运费及中国进口关税。上海门店价格通常更高。',
+      '<b>汇率</b>：2026-11-12 USD 1,343.3 韩元 · EUR 1,500.5 韩元 · GBP 1,793.0 韩元（코리안투데이汇总）。SGD 按 0.77 USD 估算（≈1,034 韩元）。',
+      '定制收纳（Poliform·Rimadesio·Molteni&C）与厨房（Boffi·Bulthaup）无公开定价，未计入合计，实际总额更高。',
+      '平面尺寸依据销售户型图（外轮廓 18.0 × 25.6 m），内墙位置为 ±10 cm 估算。3D 造型将在第二阶段精细化。',
+    ],
+  },
 };
-const SENZAFINE = { brand: 'Poliform', model: 'Senzafine', price: { v: null, note: '맞춤 견적' }, url: 'https://www.poliform.it/en/products/senzafine/' };
-
-let CHOICE = {};
-try { CHOICE = JSON.parse(localStorage.getItem('g1d-choice') || '{}') || {}; } catch (e) { CHOICE = {}; }
-for (const k in SLOTS) if (!(CHOICE[k] >= 0 && CHOICE[k] < SLOTS[k].options.length)) CHOICE[k] = 0;
-function saveChoice() { try { localStorage.setItem('g1d-choice', JSON.stringify(CHOICE)); } catch (e) {} }
+// category labels: [ko, zh, pinyin]
+const CAT = {
+  sofa: ['모듈 소파 (L 구성)', '模块沙发（L 形）', 'mókuài shāfā'], coffee: ['커피 테이블', '茶几', 'chájī'], rug: ['러그', '地毯', 'dìtǎn'],
+  lounge: ['라운지 체어', '休闲椅', 'xiūxiányǐ'], floorLamp: ['플로어 램프', '落地灯', 'luòdìdēng'], media: ['미디어 수납장', '电视柜', 'diànshìguì'],
+  tv: ['TV', '电视', 'diànshì'], speaker: ['스피커', '音箱', 'yīnxiāng'], diningTable: ['다이닝 테이블', '餐桌', 'cānzhuō'], diningChair: ['다이닝 체어', '餐椅', 'cānyǐ'],
+  pendant: ['다이닝 펜던트', '餐厅吊灯', 'cāntīng diàodēng'], tallUnit: ['서양식 주방 키큰장', '西厨高柜', 'xīchú gāoguì'], island: ['아일랜드', '中岛台', 'zhōngdǎotái'],
+  counterChair: ['카운터 체어', '吧椅', 'bāyǐ'], shelf: ['벽 선반', '书架', 'shūjià'], desk: ['책상', '书桌', 'shūzhuō'], tech: ['컴퓨터 · 모니터', '电脑与显示器', 'diànnǎo yǔ xiǎnshìqì'],
+  taskChair: ['작업 의자', '办公椅', 'bàngōngyǐ'], readingChair: ['리딩 체어', '阅读椅', 'yuèdúyǐ'], sideTable: ['사이드 테이블', '边几', 'biānjī'],
+  counter: ['주방 하부장', '橱柜', 'chúguì'], workIsland: ['작업대', '操作台', 'cāozuòtái'], fridge: ['냉장고', '冰箱', 'bīngxiāng'],
+  laundry: ['세탁·건조기', '洗衣机与烘干机', 'xǐyījī yǔ hōnggānjī'], erv: ['전열교환 환기', '新风系统', 'xīnfēng xìtǒng'], outdoor: ['아웃도어 라운지 체어', '户外休闲椅', 'hùwài xiūxiányǐ'],
+  bed: ['침대', '床', 'chuáng'], night: ['협탁', '床头柜', 'chuángtóuguì'], wardrobe: ['붙박이장', '衣柜', 'yīguì'], basin: ['세면대', '洗手台', 'xǐshǒutái'],
+  doubleBasin: ['더블 세면대', '双盆洗手台', 'shuāngpén xǐshǒutái'], toilet: ['비데 일체형 변기', '智能马桶', 'zhìnéng mǎtǒng'], shower: ['샤워 부스', '淋浴间', 'línyùjiān'],
+  tub: ['독립 욕조', '独立浴缸', 'dúlì yùgāng'], bench: ['벤치', '长凳', 'chángdèng'], shoe: ['신발장', '鞋柜', 'xiéguì'], deskChair: ['책상 의자', '书桌椅', 'shūzhuōyǐ'],
+  glassWardrobe: ['유리 도어 수납', '玻璃门衣柜', 'bōlimén yīguì'], closetIsland: ['아일랜드 서랍장', '中岛抽屉柜', 'zhōngdǎo chōutìguì'], dressing: ['화장대', '梳妆台', 'shūzhuāngtái'],
+  mirror: ['전신 거울', '穿衣镜', 'chuānyījìng'], walkin: ['워크인 수납', '步入式衣柜', 'bùrùshì yīguì'],
+};
+const SIDE = { L: ['(L)', '（左）'], R: ['(R)', '（右）'], W: ['(서측)', '（西侧）'], E: ['(동측)', '（东侧）'], N: ['(북측)', '（北侧）'] };
 
 /* ============================================================
-   3. FURNITURE SCHEDULE  (dims cm W×D×H, pos plan mm, rot° — 0 = front faces south)
+   3. PRICES, SHOWROOMS, PRODUCT CATALOGUE
+   ============================================================ */
+const FX = { KRW: 1, USD: 1343.3, EUR: 1500.5, GBP: 1793.0, SGD: 1034 };
+const SYM = { KRW: '₩', USD: '$', EUR: '€', GBP: '£', SGD: 'S$' };
+// Shanghai showrooms found Nov 2026 (official brand pages or Shanghai government listing unless noted)
+const SHOPS = {
+  'Minotti': { ko: 'Minotti Shanghai by Domus Tiandi · No.151 Jianguo West Rd, 황푸구 · +86 21 6466 8736', zh: 'Minotti 上海（Domus Tiandi）· 黄浦区建国西路151号 · +86 21 6466 8736', q: 'Minotti 上海 建国西路' },
+  'Molteni&C': { ko: '플래그십(Domus Tiandi) · B3-B, No.19 Wangda Rd, 황푸구 · 매일 10:00–19:00', zh: '旗舰店（Domus Tiandi）· 黄浦区望达路19号 B3-B · 每日 10:00–19:00', q: 'Molteni&C 上海旗舰店' },
+  'Poltrona Frau': { ko: '플래그십 · No.9–10, Lane 65, East Hengtong Rd, 징안구 · 매일 10:00–19:00 (B1 박물관)', zh: '旗舰店 · 静安区恒通路65弄9–10号 · 每日 10:00–19:00（B1 博物馆）', q: 'Poltrona Frau 上海旗舰店' },
+  'Living Divani': { ko: 'AREA LIVING · Bldg 5, No.600 North Shaanxi Rd, 징안구 · +86 21 6075 1000 (ext. 6312)', zh: 'AREA LIVING · 静安区陕西北路600号5号楼 · +86 21 6075 1000（分机 6312）', q: 'Living Divani 上海 陕西北路600号' },
+  'B&B Italia': { ko: '신톈디 · Unit L1-W10, No.168 Hubin Rd, 황푸구 (2018년 자료, 방문 전 확인)', zh: '新天地 · 黄浦区湖滨路168号 L1-W10（2018 年资料，到访前请确认）', q: 'B&B Italia 上海 新天地' },
+  'Baxter': { ko: 'Baxter Gallery Shanghai · No.50 Yongyuan Rd, 징안구 · 매일 10:00–18:00', zh: 'Baxter Gallery Shanghai · 静安区永源路50号 · 每日 10:00–18:00', q: 'Baxter 上海 永源路' },
+  'Cassina': { ko: 'H.N.LIN 파트너 매장 (2026년 4월 오픈, 예약제) · 주소 미확인', zh: 'H.N.LIN 合作门店（2026 年 4 月开业，预约制）· 地址未确认', q: 'Cassina 上海 H.N.LIN' },
+  'Poliform': { ko: '라오시먼 매장(2022) · 푸싱 매장(Spiga) · Gala Mall 단독 매장 · 주소 미확인', zh: '老西门店（2022）· 复兴店（Spiga）· Gala Mall 单品牌店 · 地址未确认', q: 'Poliform 上海' },
+  'Hästens': { ko: '상하이 매장 미확인 · 가장 가까운 확인 매장: 항저우 701 Fuchun Rd', zh: '上海门店未确认 · 已确认最近门店：杭州富春路701号', q: 'Hästens 海丝腾 上海' },
+};
+
+const PRODUCTS = {};
+function P(id, o) { o.id = id; PRODUCTS[id] = o; return o; }
+const NOTE = (ko, zh) => ({ ko, zh });
+
+// --- Sofas (living, L composition) ---
+P('extraSoft', { brand: 'Living Divani', model: 'Extra Soft', designer: 'Piero Lissoni', type: 'sofaL', dims: [380, 300, 72], c1: '#C4BBAD', c2: '#ADA394', fixed: true,
+  price: { v: 19500, cur: 'EUR', note: NOTE('Tomassini 가죽 구성 정가 예시. 모듈 수에 따라 달라져 최종가는 견적', 'Tomassini 皮革组合定价示例，按模块数量变化，最终以报价为准') }, url: 'https://www.tomassini.com/en/living-divani-extrasoft-rust-leather-sofa-expo-offer-p-8585.html',
+  mat: NOTE('패브릭·가죽, 깃털 혼합 쿠션, 바닥에 가까운 낮은 좌면', '面料或皮革，羽绒混合坐垫，低矮坐面'),
+  why: NOTE('TV 벽을 정면으로 보고 동쪽 270° 창을 오른쪽에 두는 L 구성입니다. 등받이가 다이닝과 거실의 경계가 됩니다.', 'L 形布置正对电视墙，东侧 270° 落地窗在右手边，靠背自然分隔餐厅与客厅。') });
+P('camaleonda', { brand: 'B&B Italia', model: 'Camaleonda', designer: 'Mario Bellini', type: 'sofaL', style: 'quilt', dims: [360, 280, 72], c1: '#B48C64', c2: '#7D5E42',
+  price: { v: 12290, cur: 'EUR', note: NOTE('Tomassini 패브릭 구성 예시. 구성별 €9,000~€14,000+', 'Tomassini 面料组合示例，按组合 €9,000~€14,000+') }, url: 'https://www.tomassini.com/en/bb-italia-camaleonda-beige-sofa-p-9116.html',
+  mat: NOTE('버튼 퀼팅 모듈, 패브릭·가죽', '纽扣绗缝模块，面料或皮革'), why: NOTE('1970년대 복각 모듈 소파로, 존재감이 강해 거실의 주인공이 됩니다.', '1970 年代复刻模块沙发，存在感强，是客厅主角。') });
+P('horizonte', { brand: 'Minotti', model: 'Horizonte', designer: '', type: 'sofaL', dims: [420, 300, 70], c1: '#CFC7BA', c2: '#6B625A',
+  price: { v: 51450, cur: 'USD', note: NOTE('Studio Como(덴버) 섹셔널 전시품 정가', 'Studio Como（丹佛）组合展品原价') }, url: 'https://minotti.com/en/horizonte',
+  mat: NOTE('낮고 깊은 섹셔널, 패브릭·가죽', '低矮深坐组合，面料或皮革'), why: NOTE('Minotti 상하이 플래그십에서 바로 앉아볼 수 있습니다.', '可在 Minotti 上海旗舰店直接试坐。') });
+P('groundpiece', { brand: 'Flexform', model: 'Groundpiece', designer: 'Antonio Citterio', type: 'sofaL', dims: [380, 300, 72], c1: '#B9B1A6', c2: '#4A433D',
+  price: { v: 26466, cur: 'EUR', note: NOTE('Sarto Group(독일) 정가. 구성별 €16,200~€35,000+', 'Sarto Group（德国）定价，按组合 €16,200~€35,000+') }, url: 'https://sarto-group.de/en/products/groundpiece-sofa',
+  mat: NOTE('얇은 금속 프레임, 깃털 쿠션', '纤细金属框架，羽绒坐垫'), why: NOTE('가장 클래식한 이탈리안 로우 소파입니다. 질리지 않는 선택입니다.', '最经典的意式低矮沙发，耐看不过时。') });
+P('onTheRocks', { brand: 'Edra', model: 'On the Rocks', designer: 'Francesco Binfaré', type: 'sofaL', style: 'rocks', dims: [400, 300, 75], c1: '#9DA28F', c2: '#6E7364',
+  price: { v: 20000, cur: 'EUR', note: NOTE('Tomassini 기준 약 €20,000부터, 크기·원단별 상승', 'Tomassini 约 €20,000 起，按尺寸与面料上涨') }, url: 'https://www.tomassini.com/en/edra-on-the-rocks-sofa-p-31.html',
+  mat: NOTE('Gellyfoam 블록, 자유 배치 모듈', 'Gellyfoam 软块，自由组合模块'), why: NOTE('조각 같은 형태라 소파가 오브제 역할을 합니다.', '雕塑般的造型，沙发本身就是艺术品。') });
+P('chesterMoon', { brand: 'Baxter', model: 'Chester Moon', designer: 'Paola Navone', type: 'sofaL', style: 'chester', dims: [360, 260, 70], c1: '#5A3424', c2: '#2B1D16',
+  price: { v: 15600, cur: 'EUR', note: NOTE('Tomassini 기준 €15,600~€20,400+ (크기·가죽별)', 'Tomassini €15,600~€20,400+（按尺寸与皮革）') }, url: 'https://tomassini.com/en/baxter-chester-moon-sofa-p-673.html',
+  mat: NOTE('빈티지 워싱 가죽, 체스터필드 터프팅', '做旧皮革，切斯特菲尔德拉扣'), why: NOTE('상하이 Baxter 갤러리(2025 오픈)에서 실물을 볼 수 있습니다.', '可在 2025 年开业的 Baxter 上海画廊看到实物。') });
+P('fendiSoho', { brand: 'Fendi Casa', model: 'Soho', designer: 'Toan Nguyen', type: 'sofaL', dims: [380, 290, 72], c1: '#C9B9A2', c2: '#5A4636',
+  price: { v: 24000, cur: 'EUR', note: NOTE('리셀 매물에 표기된 정가 기준. 신품은 매장 견적', '依据转售信息标注的原价，新品以门店报价为准') }, url: 'https://revive.de/en/products/fendi-soho-element-stoff-leder-ecksofa-beige-braun-modul-recamiere-rechts-sofa-couch-neubezug-by-toan-nguyen-22493-c5',
+  mat: NOTE('패브릭·가죽 혼합, FF 디테일', '面料与皮革混搭，FF 细节'), why: NOTE('하우스 브랜드 로고를 드러내는 선택입니다.', '彰显品牌标识的选择。') });
+
+// --- Coffee tables ---
+P('lc10', { brand: 'Cassina', model: 'LC10-P', designer: 'Le Corbusier · P. Jeanneret · C. Perriand', type: 'coffee', dims: [120, 120, 33], c1: '#C9CDD0', c2: '#2A2D30',
+  price: { v: 4360, cur: 'USD', note: NOTE('Hive Modern 사이즈별 $2,335~$4,360 (120 cm급은 상단)', 'Hive Modern 按尺寸 $2,335~$4,360（120 cm 为上限）') }, url: 'https://www.hivemodern.com/pages/product1143/le-corbusier-lc10-p-low-table-cassina',
+  mat: NOTE('크롬 튜브 프레임, 유리 상판', '镀铬钢管框架，玻璃台面'), why: NOTE('Extra Soft는 좌면이 낮아서 유리 상판이 시선을 덜 막습니다.', 'Extra Soft 坐面低，玻璃台面视觉上更通透。') });
+P('saarinenCoffee', { brand: 'Knoll', model: 'Saarinen Coffee Table Round', designer: 'Eero Saarinen', type: 'tulip', dims: [107, 107, 39], c1: '#EDEBE6', c2: '#F2F2F0',
+  price: { v: 3119, cur: 'USD', note: NOTE('Design Within Reach 라운드 정가. 42" 석재 상판은 상품 페이지에서 확인', 'Design Within Reach 圆形定价，42" 石材台面请于产品页确认') }, url: 'https://www.dwr.com/living-accent-coffee-tables/saarinen-coffee-table-round/100303525.html',
+  mat: NOTE('알루미늄 튤립 베이스, 대리석 상판', '铝制郁金香底座，大理石台面') });
+P('tobiCoffee', { brand: 'B&B Italia', model: 'Tobi-Ishi Coffee Table', designer: 'Edward Barber & Jay Osgerby', type: 'tobi', dims: [146, 90, 31], c1: '#8A6F55', c2: '#8A6F55',
+  price: { v: 5393, cur: 'EUR', note: NOTE('Nordiska Galleriet 오크 베니어 정가', 'Nordiska Galleriet 橡木贴皮定价') }, url: 'https://no-ga.com/en-de/bb-italia/tobi-ishi-coffee-table',
+  mat: NOTE('오크 베니어 또는 대리석', '橡木贴皮或大理石') });
+P('jacob', { brand: 'Minotti', model: 'Jacob Coffee Table', designer: '', type: 'lowTable', dims: [120, 120, 30], c1: '#D8D2C8', c2: '#3A3632',
+  price: { v: 6005, cur: 'EUR', note: NOTE('Sarto Group 정가. 치수는 추정치', 'Sarto Group 定价，尺寸为估算') }, url: 'https://sarto-group.de/en/products/minotti-jacob-couchtisch', mat: NOTE('대리석 상판, 브론즈 베이스', '大理石台面，青铜色底座') });
+P('ghiblim', { brand: 'Giorgetti', model: 'Ghiblim Coffee Table', designer: '', type: 'lowTable', style: 'round', dims: [130, 130, 32], c1: '#C9C1B4', c2: '#4A3A2E',
+  price: { v: 5100, cur: 'EUR', note: NOTE('Tomassini 기준 €5,100~€6,300+. 치수는 추정치', 'Tomassini €5,100~€6,300+，尺寸为估算') }, url: 'https://www.tomassini.com/en/giorgetti-ghiblim-coffee-table-p-8770.html', mat: NOTE('원목 베이스, 석재 상판', '实木底座，石材台面') });
+
+// --- Lounge chairs ---
+P('archibald', { brand: 'Poltrona Frau', model: 'Archibald', designer: 'Jean-Marie Massaud', type: 'armchair', style: 'archibald', dims: [96, 90, 75], c1: '#8A5A3B',
+  price: { v: 4700, cur: 'EUR', note: NOTE('Tomassini 기준 €4,700~€6,000+ (가죽 등급별)', 'Tomassini €4,700~€6,000+（按皮革等级）') }, url: 'https://tomassini.com/en/poltrona-frau-archibald-armchair-p-1777.html',
+  mat: NOTE('Pelle Frau® 가죽, 손바느질', 'Pelle Frau® 皮革，手工缝制'), why: NOTE('소파 반대편을 닫아 대화 동선을 만듭니다.', '与沙发相对，围合出交谈区域。') });
+P('egg', { brand: 'Fritz Hansen', model: 'Egg Chair', designer: 'Arne Jacobsen', type: 'armchair', style: 'egg', dims: [86, 95, 107], c1: '#6E3B2A', c2: '#C8CCCF',
+  price: { v: 10499, cur: 'EUR', note: NOTE('Finnish Design Shop 정가, Essential 가죽', 'Finnish Design Shop 定价，Essential 皮革') }, url: 'https://www.finnishdesignshop.com/en-at/product/egg-lounge-chair-black-leather-essential-black',
+  mat: NOTE('가죽, 회전 알루미늄 베이스', '皮革，旋转铝制底座') });
+P('eames', { brand: 'Vitra', model: 'Eames Lounge Chair & Ottoman', designer: 'Charles & Ray Eames', type: 'eames', dims: [84, 140, 84], c1: '#1E1C1B', c2: '#5B3A26',
+  price: { v: 8775, cur: 'EUR', note: NOTE('Salvioni 시작가(애쉬·패브릭). 가죽·월넛은 €10,000+', 'Salvioni 起价（白蜡木·面料），皮革与胡桃木 €10,000+') }, url: 'https://salvioniarredamenti.it/en/products/vitra-eames-lounge-chair-ottoman',
+  mat: NOTE('성형 합판 쉘, 가죽 쿠션', '模压胶合板外壳，皮革坐垫') });
+P('vanityFair', { brand: 'Poltrona Frau', model: 'Vanity Fair XC', designer: 'Poltrona Frau (1930)', type: 'armchair', style: 'vanity', dims: [86, 90, 92], c1: '#8E2F27', c2: '#3A2B22',
+  price: { v: 6027, cur: 'EUR', note: NOTE('Salvioni 패브릭 시작가. 가죽은 상향', 'Salvioni 面料起价，皮革更高') }, url: 'https://www.salvioniarredamenti.it/en/products/poltrona-frau-vanity-fair-armchair/',
+  mat: NOTE('Pelle Frau® 가죽, 스프링 좌면', 'Pelle Frau® 皮革，弹簧坐面') });
+P('lc2', { brand: 'Cassina', model: 'LC2 Petit Modèle', designer: 'Le Corbusier · P. Jeanneret · C. Perriand', type: 'armchair', style: 'archibald', dims: [76, 70, 67], c1: '#1F1D1C',
+  price: { v: 4118, cur: 'EUR', note: NOTE('Salvioni 시작가(패브릭). 가죽은 €5,000~€9,000+', 'Salvioni 起价（面料），皮革 €5,000~€9,000+') }, url: 'https://www.salvioniarredamenti.it/en/products/cassina-lc2-armchair/',
+  mat: NOTE('크롬 튜브 프레임, 가죽 쿠션', '镀铬钢管框架，皮革坐垫') });
+
+// --- Floor lamp, TV, speakers ---
+P('arco', { brand: 'Flos', model: 'Arco', designer: 'Achille & Pier Giacomo Castiglioni', type: 'arco', dims: [42, 215, 250], c1: '#E8E5E0', c2: '#C8CCCF',
+  price: { v: 2878, cur: 'EUR', note: NOTE('Finnish Design Shop EU 정가', 'Finnish Design Shop 欧盟定价') }, url: 'https://www.finnishdesignshop.com/en-ax/product/arco-floor-lamp', mat: NOTE('카라라 대리석 베이스, 스테인리스 아크', '卡拉拉大理石底座，不锈钢弧臂') });
+P('harmony77', { brand: 'Bang & Olufsen', model: 'Beovision Harmony 77"', designer: '', type: 'tv', dims: [172, 25, 100], c1: '#151618', c2: '#8C7A62',
+  price: { v: 21150, cur: 'EUR', note: NOTE('B&O 독일 공식 라인업 시작가', 'B&O 德国官网系列起价') }, url: 'https://www.bang-olufsen.com/de/tv-geraete/beovision-harmony', mat: NOTE('오크·알루미늄 스피커 커버가 펼쳐지는 OLED', '橡木与铝制音箱面板展开的 OLED') });
+P('harmony83', { brand: 'Bang & Olufsen', model: 'Beovision Harmony 83"', designer: '', type: 'tv', dims: [185, 25, 107], c1: '#151618', c2: '#8C7A62',
+  price: { v: 25000, cur: 'EUR', note: NOTE('독일 출시가(2022)', '德国上市价（2022）') }, url: 'https://www.whathifi.com/news/bando-beovision-harmony-is-an-83-inch-oled-tv-with-wing-like-speakers' });
+P('lgM97', { brand: 'LG', model: 'SIGNATURE OLED M 97"', designer: '', type: 'tv', dims: [215, 25, 124], c1: '#151618', c2: '#3A3C3E',
+  price: { v: 45800000, cur: 'KRW', note: NOTE('국내 출시가(2023, 무선 Zero Connect)', '韩国上市价（2023，无线 Zero Connect）') }, url: 'https://lg.com/us/press-release/lgs-industry-first-wireless-OLED-tv-liberates-your-living-space' });
+P('beolab28', { brand: 'Bang & Olufsen', model: 'Beolab 28 (1쌍)', designer: '', type: 'speaker', dims: [20, 20, 125], c1: '#2B2C2E',
+  price: { v: 14750, cur: 'USD', note: NOTE('미국 권장가(1쌍, 패브릭 그릴)', '美国建议零售价（一对，面料网罩）') }, url: 'https://www.engadget.com/bang-and-olufsen-beolab28-speaker-070031085.html' });
+P('beolab90', { brand: 'Bang & Olufsen', model: 'Beolab 90 (1쌍)', designer: '', type: 'speaker', style: 'b90', dims: [50, 55, 125], c1: '#B9BCBE',
+  price: { v: 170200, cur: 'EUR', note: NOTE('B&O 오스트리아 공식 시작가(1쌍)', 'B&O 奥地利官网起价（一对）') }, url: 'https://www.bang-olufsen.com/en/at/comparison/products/speakers/beolab-90/beolab-50/beolab-20',
+  why: NOTE('B&O 최상위 레퍼런스 스피커입니다. 거실 크기(65㎡)에 맞는 출력입니다.', 'B&O 旗舰参考级音箱，输出与 65㎡ 客厅相匹配。') });
+
+// --- Dining ---
+P('arc', { brand: 'Molteni&C', model: 'Arc Ø180', designer: 'Foster + Partners', type: 'tableRound', dims: [180, 180, 74], c1: '#AEB9B6', c2: '#A39C92',
+  price: { v: 7395, cur: 'USD', note: NOTE('Molteni&C 미국 공식몰 Arc 시작가. Ø180·대리석 상판은 견적', 'Molteni&C 美国官网 Arc 起价，Ø180 与大理石台面需询价') }, url: 'https://shop.molteni.it/collections/molteni-c-products-by-foster-partners',
+  mat: NOTE('시멘타이트 베이스, 유리 또는 대리석 상판', 'Cementite 底座，玻璃或大理石台面'), why: NOTE('원형 6인석이라 270° 창 쪽 시야를 막지 않습니다.', '圆形六人桌，不遮挡 270° 窗景。') });
+P('saarinenDining', { brand: 'Knoll', model: 'Saarinen Dining Table Round', designer: 'Eero Saarinen', type: 'tulip', dims: [152, 152, 72], c1: '#EDEBE6', c2: '#F2F2F0',
+  price: { v: 9978, cur: 'USD', note: NOTE('Design Within Reach 라운드 $3,120~$9,978 (상단값 적용)', 'Design Within Reach 圆形 $3,120~$9,978（取上限）') }, url: 'https://www.dwr.com/kitchen-dining-tables/saarinen-dining-table-round/100301199.html', mat: NOTE('대리석 상판, 튤립 베이스', '大理石台面，郁金香底座') });
+P('tobiDining', { brand: 'B&B Italia', model: 'Tobi-Ishi Ø160', designer: 'Edward Barber & Jay Osgerby', type: 'tobi', dims: [160, 160, 73], c1: '#3C3A37', c2: '#3C3A37',
+  price: { v: 5995, cur: 'GBP', note: NOTE('Innes 런던, Ø160 새틴 래커 정가', 'Innes 伦敦，Ø160 缎面漆定价') }, url: 'https://innes.co.uk/products/bb-italia-t160-tobi-ishi-round-dining-table' });
+P('concorde', { brand: 'Poliform', model: 'Concorde Round', designer: 'Emmanuel Gallina', type: 'tulip', dims: [160, 160, 74], c1: '#E6E1D8', c2: '#3A3532',
+  price: { v: 8050, cur: 'EUR', note: NOTE('Tomassini 대리석 상판 정가. 치수는 추정치', 'Tomassini 大理石台面定价，尺寸为估算') }, url: 'https://www.tomassini.com/en/poliform-concorde-table-p-3083.html' });
+P('bloom', { brand: 'Minotti', model: 'Bloom Oval', designer: '', type: 'tableOval', dims: [240, 120, 74], c1: '#E7E2DA', c2: '#3E3833',
+  price: { v: 12650, cur: 'EUR', note: NOTE('Artemest 정가. 타원형, 치수는 추정치', 'Artemest 定价，椭圆形，尺寸为估算') }, url: 'https://artemest.com/products_old/bloom-oval-dining-table' });
+P('cab', { brand: 'Cassina', model: 'Cab 412', designer: 'Mario Bellini', type: 'chair', dims: [47, 52, 82], c1: '#2F2925',
+  price: { v: 1567, cur: 'EUR', note: NOTE('Salvioni 개당 시작가(새들 가죽)', 'Salvioni 单把起价（鞍革）') }, url: 'https://salvioniarredamenti.it/en/products/cassina-cab-chair', mat: NOTE('강철 프레임 위에 지퍼로 씌운 새들 가죽', '钢架外以拉链包覆鞍革') });
+P('grace', { brand: 'Poliform', model: 'Grace', designer: 'Emmanuel Gallina', type: 'chair', dims: [50, 56, 80], c1: '#8E8379',
+  price: { v: 1365, cur: 'EUR', note: NOTE('Nordiska Galleriet 개당 시작가', 'Nordiska Galleriet 单把起价') }, url: 'https://no-ga.com/eu/poliform/grace-chair-v498241' });
+P('ch20', { brand: 'Carl Hansen & Søn', model: 'CH20 Elbow Chair', designer: 'Hans J. Wegner', type: 'chair', dims: [56, 51, 75], c1: '#9B6B43',
+  price: { v: 1265, cur: 'GBP', note: NOTE('Finnish Design Shop 정가(오크·코냑 가죽)', 'Finnish Design Shop 定价（橡木·干邑色皮革）') }, url: 'https://www.finnishdesignshop.com/en-gb/product/ch20-elbow-chair-oiled-oak-cognac-leather-thor-307' });
+P('tulipChair', { brand: 'Knoll', model: 'Tulip Arm Chair', designer: 'Eero Saarinen', type: 'chair', dims: [66, 59, 81], c1: '#F2F2F0',
+  price: { v: 3745, cur: 'USD', note: NOTE('Knoll 미국 정가', 'Knoll 美国定价') }, url: 'https://knoll.com/product/tulip-arm-chair' });
+P('bocci', { brand: 'Bocci', model: '28.7 Cluster', designer: 'Omer Arbel', type: 'pendant', style: 'bocci', dims: [120, 120, 60], c1: '#F4E6C8',
+  price: { v: 5950, cur: 'USD', note: NOTE('Hive Modern $5,950~$8,225', 'Hive Modern $5,950~$8,225') }, url: 'https://hivemodern.com/pages/product9494/28.7-cluster-seven-pendant-chandelier-omer-arbel-bocci' });
+P('adelman', { brand: 'Lindsey Adelman', model: 'Branching Bubble 8-Globe', designer: 'Lindsey Adelman', type: 'pendant', style: 'branch', dims: [130, 130, 90], c1: '#F6EFE3', c2: '#B08D57',
+  price: { v: 31200, cur: 'USD', note: NOTE('The Future Perfect 정가', 'The Future Perfect 定价') }, url: 'https://www.thefutureperfect.com/product/lighting/suspension/branching-bubbles-bb-08-03/', mat: NOTE('황동 가지, 핸드블로운 유리', '黄铜枝杈，手工吹制玻璃') });
+P('cloud', { brand: 'Apparatus', model: 'Cloud 37', designer: 'Gabriel Hendifar', type: 'pendant', style: 'cloud', dims: [100, 100, 50], c1: '#F3EEE6', c2: '#5A4A3A',
+  price: { v: 9500, cur: 'USD', note: NOTE('Garde 정가(Ø40", 리드타임 16~18주)', 'Garde 定价（Ø40"，交货期 16~18 周）') }, url: 'https://gardeshop.com/products/apparatus-studio-cloud-37-chandelier-oil-rubbed-bronze', lead: NOTE('16~18주', '16~18 周') });
+P('artichoke', { brand: 'Louis Poulsen', model: 'PH Artichoke Ø840', designer: 'Poul Henningsen', type: 'pendant', style: 'artichoke', dims: [84, 84, 77], c1: '#2A2A2A', c2: '#2A2A2A',
+  price: { v: 15700, cur: 'EUR', note: NOTE('Finnish Design Shop 정가(블랙)', 'Finnish Design Shop 定价（黑色）') }, url: 'https://finnishdesignshop.com/en-at/product/ph-artichoke-840-mm-black' });
+
+// --- Beds ---
+P('vividus', { brand: 'Hästens', model: 'Vividus', designer: 'Ferris Rafauli', type: 'bed', style: 'tall', dims: [215, 230, 120], c1: '#EEECE8', c2: '#2F4A6E',
+  price: { v: 189000, cur: 'USD', note: NOTE('보도 기준 $140,000~$189,000 (2016~2018). 현재가는 매장 견적', '媒体报道 $140,000~$189,000（2016~2018），现价以门店报价为准') }, url: 'https://www.bloomberg.com/news/articles/2016-12-02/hastens-vividus-mattress-review-price',
+  mat: NOTE('말총·면·울·아마 수작업, 약 320시간 제작', '马尾毛、棉、羊毛、亚麻手工制作，约 320 小时'), why: NOTE('머리는 서쪽 벽, 발끝은 곡면 유리를 향합니다. 아침 햇빛이 얼굴로 바로 들지 않습니다.', '床头靠西墙，床尾朝向弧形落地窗，晨光不会直射面部。') });
+P('royalState', { brand: 'Savoir', model: 'Royal State Bed', designer: '', type: 'bed', style: 'savoir', dims: [220, 235, 150], c1: '#F3F1EC', c2: '#2D3B55',
+  price: { v: 113000, cur: 'GBP', note: NOTE('2022 출시가(60개 한정). 현재가는 견적', '2022 年上市价（限量 60 张），现价需询价') }, url: 'https://savoirbeds.com/design/state', mat: NOTE('런던 수작업, 말총 매트리스, 패딩 헤드보드', '伦敦手工，马尾毛床垫，软包床头') });
+P('h2000t', { brand: 'Hästens', model: '2000T King', designer: '', type: 'bed', style: 'check', dims: [200, 215, 110], c1: '#EEECE8', c2: '#2F4A6E',
+  price: { v: 76180, cur: 'USD', note: NOTE('미국 리테일러 King 세트가', '美国零售商 King 尺寸套装价') }, url: 'https://thesleepspa.squarespace.com/hastensbeds', mat: NOTE('블루 체크 원단, 말총 스프링', '蓝格面料，马尾毛弹簧') });
+P('vibe', { brand: 'Giorgetti', model: 'Vibe Bed', designer: '', type: 'bed', style: 'wood', dims: [210, 230, 105], c1: '#EEE9E0', c2: '#5A3E2B',
+  price: { v: 14350, cur: 'EUR', note: NOTE('Tomassini 정가. 크기·원단별 €12,000~€16,000+', 'Tomassini 定价，按尺寸与面料 €12,000~€16,000+') }, url: 'https://www.tomassini.com/en/giorgetti-vibe-bed-p-8038.html', mat: NOTE('원목 프레임, 패딩 헤드보드', '实木框架，软包床头') });
+P('dream', { brand: 'Poliform', model: 'Dream Bed', designer: 'Marcel Wanders', type: 'bed', dims: [210, 230, 105], c1: '#EEECE8', c2: '#8F887F',
+  price: { v: 9485, cur: 'SGD', note: NOTE('Space Furniture 싱가포르, 180×200 패브릭 정가', 'Space Furniture 新加坡，180×200 面料定价') }, url: 'https://www.spacefurniture.com.sg/products/poliform-dream-bed' });
+P('h2000tQ', { ...PRODUCTS.h2000t, id: 'h2000tQ', model: '2000T Queen', dims: [175, 215, 110], price: { v: 62080, cur: 'USD', note: NOTE('미국 리테일러 Queen 세트가', '美国零售商 Queen 尺寸套装价') } });
+PRODUCTS.h2000tQ.id = 'h2000tQ';
+
+// --- Study ---
+P('usm', { brand: 'USM', model: 'Haller Table 175×75', designer: 'Fritz Haller', type: 'desk', dims: [175, 75, 74], c1: '#F2F1EE', c2: '#C8CCCF',
+  price: { v: 1557, cur: 'USD', note: NOTE('MOHD 정가(펄 그레이 라미네이트)', 'MOHD 定价（珍珠灰层压板）') }, url: 'https://shop.mohd.it/en/haller-laminate-table-l-175-cm-p-75-cm-pearl-grey.html',
+  why: NOTE('서쪽 벽에 붙여 북쪽 창빛이 옆에서 들어옵니다. 모니터 반사와 역광이 없습니다.', '靠西墙摆放，北侧窗光从侧面进入，显示器无反光与逆光。') });
+P('fred', { brand: 'Poltrona Frau', model: 'Fred Desk', designer: 'Neri&Hu', type: 'deskWood', dims: [137, 67, 71], c1: '#8A5A3B', c2: '#3A2B22',
+  price: { v: 7980, cur: 'GBP', note: NOTE('Aram 런던, 새들 엑스트라 가죽 상판', 'Aram 伦敦，Saddle Extra 皮革台面') }, url: 'https://www.aram.co.uk/products/fred-desk-top-in-saddle-extra-leather-camel', mat: NOTE('원목 프레임, 새들 가죽 상판', '实木框架，鞍革台面') });
+P('peek', { brand: 'Poltrona Frau', model: 'Peek-a-Book Desk', designer: 'Roberto Lazzeroni', type: 'deskWood', style: 'hutch', dims: [160, 70, 100], c1: '#5B3A26', c2: '#2E241E',
+  price: { v: 10639, cur: 'EUR', note: NOTE('Poltrona Frau 이탈리아 공식 시작가. 치수는 추정치', 'Poltrona Frau 意大利官网起价，尺寸为估算') }, url: 'https://www.poltronafrau.com/it/en/products/peek-a-book-desk.html' });
+P('ho', { brand: 'Poltrona Frau', model: 'H_O Desk', designer: 'Luca Scacchetti', type: 'deskWood', dims: [200, 90, 74], c1: '#3A2B22', c2: '#2A2420',
+  price: { v: 14640, cur: 'EUR', note: NOTE('Poltrona Frau 오스트리아 공식 시작가. 치수는 추정치', 'Poltrona Frau 奥地利官网起价，尺寸为估算') }, url: 'https://www.poltronafrau.com/at/en/products/h-o-desk.html', mat: NOTE('원목과 가죽 상판의 임원용 책상', '实木与皮革台面的行政书桌') });
+P('trust', { brand: 'Poltrona Frau', model: 'Trust Iconic Desk', designer: '', type: 'deskWood', dims: [180, 80, 74], c1: '#6B4A33', c2: '#2E241E',
+  price: { v: 7752, cur: 'EUR', note: NOTE('Poltrona Frau 프랑스 공식 시작가. 치수는 추정치', 'Poltrona Frau 法国官网起价，尺寸为估算') }, url: 'https://www.poltronafrau.com/pt/en/products/trust-iconic-desk.html' });
+P('ea119', { brand: 'Vitra', model: 'Aluminium Chair EA 119', designer: 'Charles & Ray Eames', type: 'officeChair', dims: [65, 70, 105], c1: '#2A2826', c2: '#C8CCCF',
+  price: { v: 3350, cur: 'EUR', note: NOTE('smow 정가', 'smow 定价') }, url: 'https://www.smow.com/a/VT-268-000' });
+P('embody', { brand: 'Herman Miller', model: 'Embody', designer: 'Bill Stumpf · Jeff Weber', type: 'officeChair', dims: [70, 70, 105], c1: '#2B2D2F', c2: '#3A3C3E',
+  price: { v: 2255, cur: 'USD', note: NOTE('Herman Miller 공식 스토어 정가', 'Herman Miller 官方商店定价') }, url: 'https://store.hermanmiller.com/Products/Embody-Chair', why: NOTE('장시간 작업이면 디자인보다 인체공학이 우선입니다.', '长时间工作时，人体工学优先于外观。') });
+P('vitsoe', { brand: 'Vitsœ', model: '606 Universal Shelving', designer: 'Dieter Rams', type: 'shelf606', dims: [165, 36, 220], c1: '#E9E8E4', c2: '#9A9DA0',
+  price: { v: 5856, cur: 'GBP', note: NOTE('Vitsœ 영국 책장+캐비닛 구성 예시 £5,856~£6,213', 'Vitsœ 英国书架+柜体组合示例 £5,856~£6,213') }, url: 'https://www.vitsoe.com/gb/606' });
+P('mac', { brand: 'Apple', model: 'Mac Studio (M5 Max) + Studio Display XDR', designer: '', type: 'workstation', dims: [70, 25, 50], c1: '#1B1C1E', c2: '#B9BCBE',
+  price: { v: 5798, cur: 'USD', note: NOTE('미국 시작가 Mac Studio $2,499 + Studio Display XDR $3,299', '美国起价 Mac Studio $2,499 + Studio Display XDR $3,299') }, url: 'https://www.apple.com/mac-studio/' });
+
+// --- Dressing rooms ---
+P('senzafine', { brand: 'Poliform', model: 'Senzafine Glass Walk-in', designer: '', type: 'cabinet', style: 'glass', c1: '#3B3029', c2: '#B29C82',
+  price: { v: null, note: NOTE('맞춤 견적. 공식 정가 비공개', '定制报价，无公开定价') }, url: 'https://www.poliform.it/en/products/senzafine/',
+  why: NOTE('양쪽 벽을 브론즈 유리 도어 수납으로 채웠습니다. 문을 열지 않아도 옷이 보이고 먼지는 막힙니다.', '两侧墙面为古铜色玻璃门收纳，不开门即可看到衣物，同时防尘。') });
+P('zenit', { brand: 'Rimadesio', model: 'Zenit Walk-in', designer: '', type: 'cabinet', style: 'glass', c1: '#5A5A58', c2: '#C4B8A8',
+  price: { v: null, note: NOTE('맞춤 견적', '定制报价') }, url: 'https://www.ciatdesign.com/en/zenit-walk-in-closet-rimadesio.html', lead: NOTE('약 6~8주', '约 6~8 周') });
+P('gliss', { brand: 'Molteni&C', model: 'Gliss Master Walk-in', designer: 'Vincent Van Duysen', type: 'cabinet', style: 'glass', c1: '#6A5A4A', c2: '#CDBFA9',
+  price: { v: null, note: NOTE('맞춤 견적. 플래그십 전시품 정가 €34,513 참고', '定制报价，参考旗舰店展品原价 €34,513') }, url: 'https://shop.mohd.it/en/gliss-master-walk-in-closet.html' });
+P('senzaIsland', { brand: 'Poliform', model: 'Senzafine Island (glass top)', designer: '', type: 'island', style: 'glass', dims: [160, 80, 90], c1: '#3B3029', c2: '#8C6E58',
+  price: { v: null, note: NOTE('맞춤 견적', '定制报价') }, url: 'https://www.spacefurniture.com.sg/products/poliform-senzafine-island-chest-of-drawers',
+  why: NOTE('유리 상판 아래에 시계와 주얼리를 진열합니다. 양쪽 수납과 62 cm 통로를 남겼습니다.', '玻璃台面下陈列腕表与珠宝，两侧保留 62 cm 通道。') });
+P('peekDress', { ...PRODUCTS.peek, id: 'peekDress', type: 'dressing', why: NOTE('남쪽 유리 앞에 둬서 낮에는 자연광으로 화장합니다.', '置于南侧落地窗前，白天借自然光化妆。') });
+P('fredDress', { ...PRODUCTS.fred, id: 'fredDress', type: 'dressing' });
+P('caadre', { brand: 'FIAM', model: 'Caadre Standing Mirror', designer: 'Philippe Starck', type: 'mirror', dims: [85, 35, 196], c1: '#DCE3E6',
+  price: { v: 3368, cur: 'EUR', note: NOTE('DesignItaly 주문 제작가', 'DesignItaly 定制价') }, url: 'https://designitaly.com/products/mirror-caadre-large-philippe-starck-for-fiam' });
+
+const SLOTS = {
+  sofa: { label: ['거실 소파', '客厅沙发'], options: ['extraSoft', 'camaleonda', 'horizonte', 'groundpiece', 'onTheRocks', 'chesterMoon', 'fendiSoho'] },
+  coffee: { label: ['커피 테이블', '茶几'], options: ['lc10', 'saarinenCoffee', 'tobiCoffee', 'jacob', 'ghiblim'] },
+  lounge: { label: ['거실 라운지 체어', '客厅休闲椅'], options: ['archibald', 'egg', 'eames', 'vanityFair', 'lc2'] },
+  arco: { label: ['플로어 램프', '落地灯'], options: ['arco'] },
+  tv: { label: ['TV', '电视'], options: ['harmony77', 'harmony83', 'lgM97'] },
+  speaker: { label: ['스피커', '音箱'], per: 'set', options: ['beolab28', 'beolab90'] },
+  diningTable: { label: ['다이닝 테이블', '餐桌'], options: ['arc', 'saarinenDining', 'tobiDining', 'concorde', 'bloom'] },
+  diningChair: { label: ['다이닝 체어', '餐椅'], options: ['cab', 'grace', 'ch20', 'tulipChair'] },
+  pendant: { label: ['다이닝 펜던트', '餐厅吊灯'], options: ['bocci', 'adelman', 'cloud', 'artichoke'] },
+  masterBed: { label: ['마스터 침대', '主卧床'], options: ['vividus', 'royalState', 'h2000t', 'vibe', 'dream'] },
+  bed3Bed: { label: ['침실 3 침대', '次卧床'], options: ['dream', 'vibe', 'h2000tQ'] },
+  studyDesk: { label: ['서재 책상', '书桌'], options: ['usm', 'fred', 'peek', 'ho', 'trust'] },
+  studyChair: { label: ['서재 의자', '办公椅'], options: ['ea119', 'embody'] },
+  studyShelf: { label: ['서재 선반', '书架'], options: ['vitsoe'] },
+  tech: { label: ['워크스테이션', '工作站'], options: ['mac'] },
+  studyLounge: { label: ['서재 리딩 체어', '阅读椅'], options: ['eames', 'egg', 'lc2'] },
+  closet: { label: ['드레스룸 수납', '衣帽间收纳'], per: 'set', options: ['senzafine', 'zenit', 'gliss'] },
+  closetIsland: { label: ['드레스룸 아일랜드', '衣帽间中岛'], options: ['senzaIsland'] },
+  dressing: { label: ['화장대', '梳妆台'], options: ['peekDress', 'fredDress'] },
+  closetChair: { label: ['드레스룸 체어', '衣帽间休闲椅'], options: ['vanityFair', 'egg', 'archibald'] },
+  mirror: { label: ['전신 거울', '穿衣镜'], options: ['caadre'] },
+};
+// budget packages: slot → product (sofa stays the confirmed Extra Soft)
+const PACKAGES = [
+  { id: 'high', ko: '하이엔드', zh: '高端', desc: ['검증된 클래식 위주', '经典款为主'],
+    pick: { sofa: 'extraSoft', coffee: 'lc10', lounge: 'archibald', tv: 'harmony77', speaker: 'beolab28', diningTable: 'arc', diningChair: 'cab', pendant: 'bocci', masterBed: 'dream', bed3Bed: 'dream', studyDesk: 'usm', studyChair: 'embody', studyLounge: 'eames', closet: 'senzafine', dressing: 'fredDress', closetChair: 'archibald' } },
+  { id: 'ultra', ko: '울트라 럭셔리', zh: '顶奢', desc: ['수면·조명·서재 업그레이드', '升级睡眠、照明与书房'],
+    pick: { sofa: 'extraSoft', coffee: 'tobiCoffee', lounge: 'egg', tv: 'lgM97', speaker: 'beolab28', diningTable: 'bloom', diningChair: 'tulipChair', pendant: 'adelman', masterBed: 'h2000t', bed3Bed: 'vibe', studyDesk: 'peek', studyChair: 'ea119', studyLounge: 'egg', closet: 'gliss', dressing: 'peekDress', closetChair: 'vanityFair' } },
+  { id: 'top', ko: '최상위 컬렉션', zh: '收藏级', desc: ['Vividus · Beolab 90', 'Vividus · Beolab 90'],
+    pick: { sofa: 'extraSoft', coffee: 'jacob', lounge: 'vanityFair', tv: 'harmony83', speaker: 'beolab90', diningTable: 'saarinenDining', diningChair: 'tulipChair', pendant: 'adelman', masterBed: 'vividus', bed3Bed: 'h2000tQ', studyDesk: 'ho', studyChair: 'ea119', studyLounge: 'egg', closet: 'zenit', dressing: 'peekDress', closetChair: 'vanityFair' } },
+];
+
+/* ============================================================
+   4. FURNITURE SCHEDULE  (dims cm W×D×H, pos plan mm, rot° — 0 = front faces south)
    ============================================================ */
 const ITEMS = [];
 let _n = 0;
 function add(o) { o.id = 'f' + (++_n); ITEMS.push(o); return o; }
 function addS(slot, room, cat, pos, rot, extra = {}) { return add({ slot, room, cat, pos, rot, ...extra }); }
-const OPTION_FIELDS = ['brand', 'model', 'designer', 'type', 'style', 'dims', 'c1', 'c2', 'price', 'url', 'fixed', 'why'];
+const OPTION_FIELDS = ['brand', 'model', 'designer', 'type', 'style', 'dims', 'c1', 'c2', 'price', 'url', 'fixed', 'why', 'mat', 'lead', 'double'];
+let CHOICE = {};
 function applySlot(it) {
-  const o = SLOTS[it.slot].options[CHOICE[it.slot]];
+  const o = PRODUCTS[CHOICE[it.slot]];
   for (const f of OPTION_FIELDS) it[f] = o[f];
+  it.pid = o.id;
   if (it.dimsOverride) it.dims = it.dimsOverride;
 }
 
 // Living
-addS('sofa', 'living', '모듈 소파 (L 구성)', [14800, 11800], 0);
-addS('coffee', 'living', '커피 테이블', [14250, 12450], 0);
-add({ room: 'living', type: 'rug', cat: '러그', brand: 'cc-tapis', model: '핸드노티드 러그 (컬렉션 선택)', designer: '', dims: [400, 300, 1], pos: [14500, 12200], rot: 0, c1: '#B5ABA0' });
-addS('lounge', 'living', '라운지 체어', [12300, 12450], 90);
-addS('arco', 'living', '플로어 램프', [12500, 10500], 38);
-add({ room: 'living', type: 'cabinet', cat: '미디어 수납장', brand: 'Molteni&C', model: '505 수납 시스템', designer: '', dims: [320, 50, 45], pos: [14800, 14380], rot: 180, c1: '#3E3A36', c2: '#3E3A36' });
-addS('tv', 'living', 'TV', [14800, 14450], 180, { elev: 0.45 });
-addS('speaker', 'living', '스피커 (L)', [13000, 14420], 180);
-addS('speaker', 'living', '스피커 (R)', [16600, 14420], 180);
-addS('diningTable', 'living', '다이닝 테이블', [14900, 7200], 0);
+addS('sofa', 'living', 'sofa', [14800, 11800], 0);
+addS('coffee', 'living', 'coffee', [14250, 12450], 0);
+add({ room: 'living', type: 'rug', cat: 'rug', brand: 'cc-tapis', model: 'Hand-knotted rug', designer: '', dims: [400, 300, 1], pos: [14500, 12200], rot: 0, c1: '#B5ABA0' });
+addS('lounge', 'living', 'lounge', [12300, 12450], 90);
+addS('arco', 'living', 'floorLamp', [12500, 10500], 38);
+add({ room: 'living', type: 'cabinet', cat: 'media', brand: 'Molteni&C', model: '505', designer: '', dims: [320, 50, 45], pos: [14800, 14380], rot: 180, c1: '#3E3A36', c2: '#3E3A36' });
+addS('tv', 'living', 'tv', [14800, 14450], 180, { elev: 0.45 });
+addS('speaker', 'living', 'speaker', [13000, 14420], 180, { side: 'L' });
+addS('speaker', 'living', 'speaker', [16600, 14420], 180, { side: 'R' });
+addS('diningTable', 'living', 'diningTable', [14900, 7200], 0);
 {
   const cx = 14900, cy = 7200, R = 1150;
   for (let k = 0; k < 6; k++) {
-    const a = (k * 60 + 30) * Math.PI / 180;
-    const px = cx + R * Math.cos(a), py = cy + R * Math.sin(a);
-    addS('diningChair', 'living', '다이닝 체어', [Math.round(px), Math.round(py)], Math.atan2(cx - px, cy - py) * 180 / Math.PI);
+    const a = (k * 60 + 30) * Math.PI / 180, px = cx + R * Math.cos(a), py = cy + R * Math.sin(a);
+    addS('diningChair', 'living', 'diningChair', [Math.round(px), Math.round(py)], Math.atan2(cx - px, cy - py) * 180 / Math.PI);
   }
 }
-addS('pendant', 'living', '다이닝 펜던트', [14900, 7200], 0);
-add({ room: 'living', type: 'cabinet', cat: '서양식 주방 키큰장', brand: 'Boffi', model: 'Code (Gaggenau 오븐 · Sub-Zero 와인셀러 빌트인)', designer: '', dims: [380, 62, 240], pos: [9800, 7000], rot: 90, c1: '#2F3133', c2: '#2F3133',
-  price: { v: null, note: '주방 전체 맞춤 견적' }, url: 'https://www.boffi.com/', why: '서쪽 벽 전체를 수납벽으로 써서 거실 쪽에 생활감이 드러나지 않게 합니다.' });
-add({ room: 'living', type: 'island', cat: '아일랜드', brand: 'Boffi', model: 'Code 아일랜드', designer: '', dims: [320, 110, 92], pos: [11700, 7000], rot: 90, c1: '#2F3133', c2: '#E6E2DB',
-  price: { v: null, note: '주방 전체 맞춤 견적' }, url: 'https://www.boffi.com/', why: '키큰장과 104 cm 작업 통로를 확보했고, 동쪽 오버행에 카운터 체어 3개가 들어갑니다.' });
-for (const y of [6100, 7000, 7900]) add({ room: 'living', type: 'stool', cat: '카운터 체어', brand: 'Gubi', model: 'Beetle Counter Chair', designer: 'GamFratesi', dims: [56, 55, 98], pos: [12550, y], rot: -90, c1: '#3D4A3E', c2: '#B08D57' });
+addS('pendant', 'living', 'pendant', [14900, 7200], 0);
+const BOFFI = { price: { v: null, note: NOTE('주방 전체 맞춤 견적', '厨房整体定制报价') }, url: 'https://www.boffi.com/' };
+add({ room: 'living', type: 'cabinet', cat: 'tallUnit', brand: 'Boffi', model: 'Code (Gaggenau · Sub-Zero built-in)', designer: '', dims: [380, 62, 240], pos: [9800, 7000], rot: 90, c1: '#2F3133', c2: '#2F3133', ...BOFFI,
+  why: NOTE('서쪽 벽 전체를 수납벽으로 써서 거실 쪽에 생활감이 드러나지 않게 합니다.', '整面西墙做收纳墙，客厅一侧看不到生活杂物。') });
+add({ room: 'living', type: 'island', cat: 'island', brand: 'Boffi', model: 'Code Island', designer: '', dims: [320, 110, 92], pos: [11700, 7000], rot: 90, c1: '#2F3133', c2: '#E6E2DB', ...BOFFI,
+  why: NOTE('키큰장과 104 cm 작업 통로를 확보했습니다.', '与高柜之间保留 104 cm 操作通道。') });
+for (const y of [6100, 7000, 7900]) add({ room: 'living', type: 'stool', cat: 'counterChair', brand: 'Gubi', model: 'Beetle Counter Chair', designer: 'GamFratesi', dims: [56, 55, 98], pos: [12550, y], rot: -90, c1: '#3D4A3E', c2: '#B08D57' });
 
 // Study (former family room)
-addS('studyShelf', 'family', '벽 선반', [11780, 820], 90);
-addS('studyDesk', 'family', '책상', [11975, 2750], 90);
-addS('tech', 'family', '컴퓨터 · 모니터', [11800, 2750], 90, { elev: 0.74 });
-addS('studyChair', 'family', '작업 의자', [12700, 2750], -90);
-addS('studyLounge', 'family', '리딩 체어', [13700, 1600], 200);
-add({ room: 'family', type: 'side', cat: '사이드 테이블', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [14150, 2350], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
+addS('studyShelf', 'family', 'shelf', [11780, 820], 90);
+addS('studyDesk', 'family', 'desk', [11975, 2750], 90);
+addS('tech', 'family', 'tech', [11800, 2750], 90, { elev: 0.74 });
+addS('studyChair', 'family', 'taskChair', [12700, 2750], -90);
+addS('studyLounge', 'family', 'readingChair', [13700, 1600], 200);
+const PLATNER = { type: 'side', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' };
+add({ room: 'family', cat: 'sideTable', ...PLATNER, pos: [14150, 2350] });
 
 // Chinese kitchen
-const KPRICE = { price: { v: null, note: '주방 전체 맞춤 견적' }, url: 'https://www.bulthaup.com/' };
-add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: '주방 하부장 (북측)', brand: 'Bulthaup', model: 'b3 · Gaggenau Vario 400 쿡탑', designer: '', dims: [320, 65, 90], pos: [9500, 450], rot: 0, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
-add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: '주방 하부장 (동측)', brand: 'Bulthaup', model: 'b3', designer: '', dims: [220, 65, 90], pos: [10970, 2050], rot: -90, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
-add({ room: 'kitchen', type: 'island', cat: '작업대', brand: 'Bulthaup', model: 'b3 워크 아일랜드', designer: '', dims: [180, 80, 90], pos: [9200, 2200], rot: 0, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
-add({ room: 'kitchen', type: 'appliance', cat: '냉장고', brand: 'Sub-Zero', model: '빌트인 냉장·냉동고', designer: '', dims: [91, 61, 213], pos: [7560, 3100], rot: 90, c1: '#B9BCBE' });
+const KPRICE = { price: { v: null, note: NOTE('주방 전체 맞춤 견적', '厨房整体定制报价') }, url: 'https://www.bulthaup.com/' };
+add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: 'counter', side: 'N', brand: 'Bulthaup', model: 'b3 · Gaggenau Vario 400', designer: '', dims: [320, 65, 90], pos: [9500, 450], rot: 0, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
+add({ room: 'kitchen', type: 'cabinet', style: 'counter', cat: 'counter', side: 'E', brand: 'Bulthaup', model: 'b3', designer: '', dims: [220, 65, 90], pos: [10970, 2050], rot: -90, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
+add({ room: 'kitchen', type: 'island', cat: 'workIsland', brand: 'Bulthaup', model: 'b3 Work Island', designer: '', dims: [180, 80, 90], pos: [9200, 2200], rot: 0, c1: '#55585B', c2: '#D6D2CA', ...KPRICE });
+add({ room: 'kitchen', type: 'appliance', cat: 'fridge', brand: 'Sub-Zero', model: 'Built-in Refrigerator', designer: '', dims: [91, 61, 213], pos: [7560, 3100], rot: 90, c1: '#B9BCBE' });
 
 // Equipment room, balcony
-add({ room: 'equip', type: 'appliance', cat: '세탁·건조기', brand: 'Miele', model: 'W1 / T1 스택', designer: '', dims: [60, 65, 180], pos: [4000, 450], rot: 0, c1: '#E9E9E7' });
-add({ room: 'equip', type: 'appliance', cat: '전열교환 환기', brand: 'Zehnder', model: 'ComfoAir Q', designer: '', dims: [80, 55, 90], pos: [6600, 400], rot: 0, c1: '#F1F1EF' });
-add({ room: 'balcony', type: 'armchair', style: 'outdoor', cat: '아웃도어 라운지 체어', brand: 'Kettal', model: 'Vieques', designer: 'Patricia Urquiola', dims: [78, 80, 72], pos: [1550, 1050], rot: 200, c1: '#E2D8C6' });
-add({ room: 'balcony', type: 'armchair', style: 'outdoor', cat: '아웃도어 라운지 체어', brand: 'Kettal', model: 'Vieques', designer: 'Patricia Urquiola', dims: [78, 80, 72], pos: [2700, 1050], rot: 160, c1: '#E2D8C6' });
+add({ room: 'equip', type: 'appliance', cat: 'laundry', brand: 'Miele', model: 'W1 / T1', designer: '', dims: [60, 65, 180], pos: [4000, 450], rot: 0, c1: '#E9E9E7' });
+add({ room: 'equip', type: 'appliance', cat: 'erv', brand: 'Zehnder', model: 'ComfoAir Q', designer: '', dims: [80, 55, 90], pos: [6600, 400], rot: 0, c1: '#F1F1EF' });
+for (const [x, r] of [[1550, 200], [2700, 160]]) add({ room: 'balcony', type: 'armchair', style: 'outdoor', cat: 'outdoor', brand: 'Kettal', model: 'Vieques', designer: 'Patricia Urquiola', dims: [78, 80, 72], pos: [x, 1050], rot: r, c1: '#E2D8C6' });
 
 // Guest bedroom
-add({ room: 'bed4', type: 'bed', cat: '침대 (160×200)', brand: 'Cassina', model: 'Volage EX-S', designer: 'Philippe Starck', dims: [180, 215, 100], pos: [1800, 4575], rot: 180, c1: '#D9D2C6', c2: '#4B3A2D' });
-add({ room: 'bed4', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [600, 5300], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'bed4', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [3000, 5300], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'bed4', type: 'cabinet', cat: '붙박이장', designer: '', dims: [200, 60, 240], pos: [3300, 2800], rot: -90, c1: '#5B4636', c2: '#5B4636', ...SENZAFINE });
+add({ room: 'bed4', type: 'bed', cat: 'bed', brand: 'Cassina', model: 'Volage EX-S', designer: 'Philippe Starck', dims: [180, 215, 100], pos: [1800, 4575], rot: 180, c1: '#D9D2C6', c2: '#4B3A2D' });
+add({ room: 'bed4', cat: 'night', ...PLATNER, pos: [600, 5300] });
+add({ room: 'bed4', cat: 'night', ...PLATNER, pos: [3000, 5300] });
+const SENZA = { brand: 'Poliform', model: 'Senzafine', designer: '', price: { v: null, note: NOTE('맞춤 견적', '定制报价') }, url: 'https://www.poliform.it/en/products/senzafine/' };
+add({ room: 'bed4', type: 'cabinet', cat: 'wardrobe', dims: [200, 60, 240], pos: [3300, 2800], rot: -90, c1: '#5B4636', c2: '#5B4636', ...SENZA });
 
 // Bathrooms
-const LUPI = { brand: 'Antonio Lupi', designer: '' }, TOTO = { brand: 'TOTO', model: 'Neorest', designer: '' }, DORN = { brand: 'Dornbracht', designer: '' };
-add({ room: 'bath1', type: 'vanity', cat: '세면대', ...LUPI, model: '세면대 (모델 선택)', dims: [120, 50, 85], pos: [4400, 2050], rot: 0, c1: '#EDEBE7', c2: '#6D6258' });
-add({ room: 'bath1', type: 'toilet', cat: '비데 일체형 변기', ...TOTO, dims: [40, 70, 50], pos: [5900, 2150], rot: 0, c1: '#F6F6F4' });
-add({ room: 'bath1', type: 'shower', cat: '샤워 부스', ...DORN, model: '샤워 수전 (부스 맞춤 제작)', dims: [100, 100, 200], pos: [4100, 3300], rot: 0, c1: '#C9CDD0' });
-add({ room: 'bath2', type: 'vanity', cat: '세면대', ...LUPI, model: '세면대 (모델 선택)', dims: [100, 50, 85], pos: [9300, 15200], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
-add({ room: 'bath2', type: 'toilet', cat: '비데 일체형 변기', ...TOTO, dims: [40, 70, 50], pos: [9400, 16300], rot: 90, c1: '#F6F6F4' });
-add({ room: 'bath2', type: 'shower', cat: '샤워 부스', ...DORN, model: '샤워 수전 (부스 맞춤 제작)', dims: [100, 100, 200], pos: [10350, 16200], rot: 0, c1: '#C9CDD0' });
-add({ room: 'bath3', type: 'vanity', cat: '세면대', ...LUPI, model: '세면대 (모델 선택)', dims: [120, 50, 85], pos: [6700, 17600], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
-add({ room: 'bath3', type: 'toilet', cat: '비데 일체형 변기', ...TOTO, dims: [40, 70, 50], pos: [6800, 18800], rot: 90, c1: '#F6F6F4' });
-add({ room: 'bath3', type: 'shower', cat: '샤워 부스', ...DORN, model: '샤워 수전 (부스 맞춤 제작)', dims: [120, 100, 200], pos: [7900, 19600], rot: 0, c1: '#C9CDD0' });
+const LUPI = { brand: 'Antonio Lupi', designer: '', model: 'Basin (model TBD)' }, TOTO = { brand: 'TOTO', model: 'Neorest', designer: '' }, DORN = { brand: 'Dornbracht', designer: '', model: 'Shower (custom enclosure)' };
+add({ room: 'bath1', type: 'vanity', cat: 'basin', ...LUPI, dims: [120, 50, 85], pos: [4400, 2050], rot: 0, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath1', type: 'toilet', cat: 'toilet', ...TOTO, dims: [40, 70, 50], pos: [5900, 2150], rot: 0, c1: '#F6F6F4' });
+add({ room: 'bath1', type: 'shower', cat: 'shower', ...DORN, dims: [100, 100, 200], pos: [4100, 3300], rot: 0, c1: '#C9CDD0' });
+add({ room: 'bath2', type: 'vanity', cat: 'basin', ...LUPI, dims: [100, 50, 85], pos: [9300, 15200], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath2', type: 'toilet', cat: 'toilet', ...TOTO, dims: [40, 70, 50], pos: [9400, 16300], rot: 90, c1: '#F6F6F4' });
+add({ room: 'bath2', type: 'shower', cat: 'shower', ...DORN, dims: [100, 100, 200], pos: [10350, 16200], rot: 0, c1: '#C9CDD0' });
+add({ room: 'bath3', type: 'vanity', cat: 'basin', ...LUPI, dims: [120, 50, 85], pos: [6700, 17600], rot: 90, c1: '#EDEBE7', c2: '#6D6258' });
+add({ room: 'bath3', type: 'toilet', cat: 'toilet', ...TOTO, dims: [40, 70, 50], pos: [6800, 18800], rot: 90, c1: '#F6F6F4' });
+add({ room: 'bath3', type: 'shower', cat: 'shower', ...DORN, dims: [120, 100, 200], pos: [7900, 19600], rot: 0, c1: '#C9CDD0' });
 
 // Lift hall + foyer
-add({ room: 'lift', type: 'bench', cat: '벤치', brand: 'Knoll', model: 'Florence Knoll Bench', designer: 'Florence Knoll', dims: [190, 46, 38], pos: [8800, 14500], rot: -90, c1: '#242322', c2: '#C8CCCF' });
-add({ room: 'foyer', type: 'cabinet', cat: '신발장', brand: 'Molteni&C', model: 'Gliss Master', designer: 'Vincent Van Duysen', dims: [220, 45, 220], pos: [10300, 14420], rot: 180, c1: '#6A5A4A', c2: '#6A5A4A',
-  price: { v: null, note: '맞춤 견적' }, url: 'https://shop.mohd.it/en/gliss-master-walk-in-closet.html', why: '현관 문을 열면 정면이 아니라 측면에 보이도록 남쪽 벽에 붙였습니다.' });
+add({ room: 'lift', type: 'bench', cat: 'bench', brand: 'Knoll', model: 'Florence Knoll Bench', designer: 'Florence Knoll', dims: [190, 46, 38], pos: [8800, 14500], rot: -90, c1: '#242322', c2: '#C8CCCF' });
+add({ room: 'foyer', type: 'cabinet', cat: 'shoe', brand: 'Molteni&C', model: 'Gliss Master', designer: 'Vincent Van Duysen', dims: [220, 45, 220], pos: [10300, 14420], rot: 180, c1: '#6A5A4A', c2: '#6A5A4A',
+  price: { v: null, note: NOTE('맞춤 견적', '定制报价') }, url: 'https://shop.mohd.it/en/gliss-master-walk-in-closet.html',
+  why: NOTE('현관 문을 열면 정면이 아니라 측면에 보이도록 남쪽 벽에 붙였습니다.', '贴南墙摆放，开门时位于侧面而非正对。') });
 
 // Bedroom 3
-addS('bed3Bed', 'bed3', '침대', [7575, 22800], 90);
-add({ room: 'bed3', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [6700, 21500], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'bed3', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [6700, 24100], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'bed3', type: 'desk', cat: '책상', brand: 'USM', model: 'Haller Table 175×75', designer: 'Fritz Haller', dims: [175, 75, 74], pos: [8700, 25050], rot: 180, c1: '#F2F1EE', c2: '#C8CCCF',
-  price: { v: 1557, cur: 'USD', note: 'MOHD 정가(펄 그레이 라미네이트)' }, url: 'https://shop.mohd.it/en/haller-laminate-table-l-175-cm-p-75-cm-pearl-grey.html' });
-add({ room: 'bed3', type: 'officeChair', cat: '책상 의자', brand: 'Vitra', model: 'Aluminium Chair EA 117', designer: 'Charles & Ray Eames', dims: [58, 58, 90], pos: [8700, 24350], rot: 0, c1: '#2A2826', c2: '#C8CCCF' });
-add({ room: 'bed3', cat: '라운지 체어', ...EGG, pos: [9700, 22200], rot: -110 });
-add({ room: 'bed3', type: 'cabinet', cat: '붙박이장', designer: '', dims: [150, 60, 240], pos: [10050, 19525], rot: -90, c1: '#5B4636', c2: '#5B4636', ...SENZAFINE });
+addS('bed3Bed', 'bed3', 'bed', [7575, 22800], 90);
+add({ room: 'bed3', cat: 'night', ...PLATNER, pos: [6700, 21500] });
+add({ room: 'bed3', cat: 'night', ...PLATNER, pos: [6700, 24100] });
+add({ room: 'bed3', cat: 'desk', ...PRODUCTS.usm, id: undefined, pos: [8700, 25050], rot: 180, why: undefined });
+add({ room: 'bed3', type: 'officeChair', cat: 'deskChair', brand: 'Vitra', model: 'Aluminium Chair EA 117', designer: 'Charles & Ray Eames', dims: [58, 58, 90], pos: [8700, 24350], rot: 0, c1: '#2A2826', c2: '#C8CCCF' });
+add({ room: 'bed3', cat: 'lounge', ...PRODUCTS.egg, id: undefined, pos: [9700, 22200], rot: -110 });
+add({ room: 'bed3', type: 'cabinet', cat: 'wardrobe', dims: [150, 60, 240], pos: [10050, 19525], rot: -90, c1: '#5B4636', c2: '#5B4636', ...SENZA });
 
 // Wife's dressing room (former bedroom 2)
-addS('closet', 'bed2', '유리 도어 수납 (서측)', [10650, 20600], 90, { dimsOverride: [390, 60, 240] });
-addS('closet', 'bed2', '유리 도어 수납 (동측)', [13300, 20300], -90, { dimsOverride: [340, 60, 240] });
-addS('closetIsland', 'bed2', '아일랜드 서랍장', [11975, 20400], 90);
-addS('dressing', 'bed2', '화장대', [11975, 22950], 180);
-addS('closetChair', 'bed2', '라운지 체어', [13100, 22650], -135);
-addS('mirror', 'bed2', '전신 거울', [12550, 18700], 0);
-add({ room: 'bed2', type: 'rug', cat: '러그', brand: 'cc-tapis', model: '핸드노티드 러그 (컬렉션 선택)', designer: '', dims: [200, 300, 1], pos: [11975, 20600], rot: 0, c1: '#C9BDB4' });
+addS('closet', 'bed2', 'glassWardrobe', [10650, 20600], 90, { dimsOverride: [390, 60, 240], side: 'W' });
+addS('closet', 'bed2', 'glassWardrobe', [13300, 20300], -90, { dimsOverride: [340, 60, 240], side: 'E' });
+addS('closetIsland', 'bed2', 'closetIsland', [11975, 20400], 90);
+addS('dressing', 'bed2', 'dressing', [11975, 22950], 180);
+addS('closetChair', 'bed2', 'lounge', [13100, 22650], -135);
+addS('mirror', 'bed2', 'mirror', [12550, 18700], 0);
+add({ room: 'bed2', type: 'rug', cat: 'rug', brand: 'cc-tapis', model: 'Hand-knotted rug', designer: '', dims: [200, 300, 1], pos: [11975, 20600], rot: 0, c1: '#C9BDB4' });
 
-// Master dressing room
-add({ room: 'cloak', type: 'cabinet', style: 'open', cat: '워크인 수납 (서측)', designer: '', dims: [220, 60, 240], pos: [13150, 15800], rot: 90, c1: '#4A3B30', c2: '#9A8A78', ...SENZAFINE, model: 'Senzafine 워크인' });
-add({ room: 'cloak', type: 'cabinet', style: 'open', cat: '워크인 수납 (동측)', designer: '', dims: [160, 60, 240], pos: [14400, 15600], rot: -90, c1: '#4A3B30', c2: '#9A8A78', ...SENZAFINE, model: 'Senzafine 워크인' });
-
-// Master bath
-add({ room: 'mbath', type: 'tub', cat: '독립 욕조', brand: 'Agape', model: 'Spoon XL', designer: 'Benedini Associati', dims: [185, 85, 52], pos: [17400, 16700], rot: 90, c1: '#F4F3F0', why: '동쪽 창 쪽에 길게 두어 욕조에서 바깥을 봅니다.' });
-add({ room: 'mbath', type: 'vanity', cat: '더블 세면대', ...LUPI, model: '더블 세면대 (모델 선택)', dims: [200, 55, 85], pos: [15900, 18200], rot: 180, c1: '#EDEBE7', c2: '#6D6258', double: true });
-add({ room: 'mbath', type: 'toilet', cat: '비데 일체형 변기', ...TOTO, dims: [40, 70, 50], pos: [16700, 15000], rot: 0, c1: '#F6F6F4' });
-add({ room: 'mbath', type: 'shower', cat: '샤워 부스', ...DORN, model: '레인 샤워 (부스 맞춤 제작)', dims: [120, 120, 200], pos: [15400, 15400], rot: 0, c1: '#C9CDD0' });
-
-// Master bedroom
-add({ room: 'master', type: 'rug', cat: '러그', brand: 'cc-tapis', model: '핸드노티드 러그 (컬렉션 선택)', designer: '', dims: [300, 350, 1], pos: [15100, 21000], rot: 0, c1: '#9C9188' });
-addS('masterBed', 'master', '침대', [14750, 21000], 90);
-add({ room: 'master', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13850, 19650], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'master', type: 'side', cat: '협탁', brand: 'Knoll', model: 'Platner Side Table', designer: 'Warren Platner', dims: [41, 41, 50], pos: [13850, 22350], rot: 0, c1: '#E6E3DE', c2: '#B89A5E' });
-add({ room: 'master', type: 'armchair', style: 'husk', cat: '라운지 체어', brand: 'B&B Italia', model: 'Husk Armchair', designer: 'Patricia Urquiola', dims: [83, 86, 92], pos: [17050, 19450], rot: -135, c1: '#6B6560', c2: '#3A3734' });
-
-ITEMS.forEach(it => { if (it.slot) applySlot(it); });
-
+// Master dressing room, bath, bedroom
+add({ room: 'cloak', type: 'cabinet', style: 'open', cat: 'walkin', side: 'W', dims: [220, 60, 240], pos: [13150, 15800], rot: 90, c1: '#4A3B30', c2: '#9A8A78', ...SENZA, model: 'Senzafine Walk-in' });
+add({ room: 'cloak', type: 'cabinet', style: 'open', cat: 'walkin', side: 'E', dims: [160, 60, 240], pos: [14400, 15600], rot: -90, c1: '#4A3B30', c2: '#9A8A78', ...SENZA, model: 'Senzafine Walk-in' });
+add({ room: 'mbath', type: 'tub', cat: 'tub', brand: 'Agape', model: 'Spoon XL', designer: 'Benedini Associati', dims: [185, 85, 52], pos: [17400, 16700], rot: 90, c1: '#F4F3F0', why: NOTE('동쪽 창 쪽에 길게 두어 욕조에서 바깥을 봅니다.', '沿东窗纵向摆放，泡澡时可看窗外。') });
+add({ room: 'mbath', type: 'vanity', cat: 'doubleBasin', ...LUPI, model: 'Double basin (model TBD)', dims: [200, 55, 85], pos: [15900, 18200], rot: 180, c1: '#EDEBE7', c2: '#6D6258', double: true });
+add({ room: 'mbath', type: 'toilet', cat: 'toilet', ...TOTO, dims: [40, 70, 50], pos: [16700, 15000], rot: 0, c1: '#F6F6F4' });
+add({ room: 'mbath', type: 'shower', cat: 'shower', ...DORN, model: 'Rain shower (custom enclosure)', dims: [120, 120, 200], pos: [15400, 15400], rot: 0, c1: '#C9CDD0' });
+add({ room: 'master', type: 'rug', cat: 'rug', brand: 'cc-tapis', model: 'Hand-knotted rug', designer: '', dims: [300, 350, 1], pos: [15100, 21000], rot: 0, c1: '#9C9188' });
+addS('masterBed', 'master', 'bed', [14750, 21000], 90);
+add({ room: 'master', cat: 'night', ...PLATNER, pos: [13850, 19650] });
+add({ room: 'master', cat: 'night', ...PLATNER, pos: [13850, 22350] });
+add({ room: 'master', type: 'armchair', style: 'husk', cat: 'lounge', brand: 'B&B Italia', model: 'Husk Armchair', designer: 'Patricia Urquiola', dims: [83, 86, 92], pos: [17050, 19450], rot: -135, c1: '#6B6560', c2: '#3A3734' });
 /* ============================================================
    4. RENDERER / SCENE
    ============================================================ */
@@ -802,7 +984,34 @@ const tGlass = c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.06, 
 const legs4 = (g, w, d, h, inset, mat, r = 0.012) => { for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl(g, r, r, h, sx * (w / 2 - inset), 0, sz * (d / 2 - inset), mat, 10); };
 const B = {
   sofaL(g, w, d, h, it) {
-    const fab = M(it.c1, 0.95), base = M(it.c2, 0.95), D = 1.05, z0 = -d / 2;
+    const fab = M(it.c1, it.style === 'chester' ? 0.45 : 0.95), base = M(it.c2, 0.95), D = 1.05, z0 = -d / 2;
+    if (it.style === 'chester') {
+      // tight tufted leather: low back flush with rolled arms, button grid
+      const btn = M(it.c2, 0.4);
+      bx(g, w, 0.42, D, 0, 0.06, z0 + D / 2, fab, 0.06);
+      bx(g, w, 0.32, 0.22, 0, 0.42, z0 + 0.11, fab, 0.08);
+      for (const s of [-1, 1]) cyl(g, 0.13, 0.13, D, s * (w / 2 - 0.1), 0.42, z0 + D / 2, fab, 18).rotation.x = Math.PI / 2;
+      for (let x = -w / 2 + 0.25; x < w / 2 - 0.2; x += 0.22) for (const y of [0.5, 0.62]) cyl(g, 0.012, 0.012, 0.01, x + (y > 0.55 ? 0.11 : 0), y, z0 + 0.225, btn, 8).rotation.x = Math.PI / 2;
+      const Lc2 = d - D;
+      bx(g, D, 0.42, Lc2, w / 2 - D / 2, 0.06, z0 + D + Lc2 / 2, fab, 0.06);
+      legs4(g, w, D, 0.06, 0.08, M('#2B211B', 0.5), 0.02);
+      return;
+    }
+    if (it.style === 'rocks' || it.style === 'quilt') {
+      // freestanding soft blocks; quilt = buttoned modules, rocks = uneven boulders
+      const quilt = it.style === 'quilt';
+      const mods = Math.max(3, Math.round(w / 1.0));
+      for (let k = 0; k < mods; k++) {
+        const mw = w / mods - 0.015, x = -w / 2 + (k + 0.5) * w / mods;
+        const bump = quilt ? 0 : ((k * 37) % 7) * 0.012;
+        bx(g, mw, 0.4 + bump, D, x, 0, z0 + D / 2, fab, 0.12);
+        bx(g, mw, 0.32 + bump, 0.3, x, 0.36, z0 + 0.15, fab, 0.13);
+        if (quilt) for (const zz of [0.3, 0.6]) for (const xx of [-mw / 4, mw / 4]) cyl(g, 0.014, 0.014, 0.01, x + xx, 0.4, z0 + 0.3 + zz * 0.6, M(it.c2, 0.6), 8);
+      }
+      const Lc2 = d - D, n2 = Math.max(1, Math.round(Lc2 / 1.0));
+      for (let k = 0; k < n2; k++) bx(g, D - 0.015, 0.4, Lc2 / n2 - 0.015, w / 2 - D / 2, 0, z0 + D + (k + 0.5) * Lc2 / n2, fab, 0.12);
+      return;
+    }
     bx(g, w, 0.2, D, 0, 0, z0 + D / 2, base, 0.03);
     for (let k = 0; k < 3; k++) {
       const cw = w / 3 - 0.02, x = -w / 2 + w / 6 + k * w / 3;
@@ -894,7 +1103,16 @@ const B = {
     bx(g, w * 0.9, h - 0.72, 0.07, 0, 0.72, -d / 2 + 0.07, M(it.c1, 0.95), 0.03);
   },
   bed(g, w, d, h, it) {
-    const frame = M(it.c2, 0.75), linen = M(it.c1, 0.95), white = M('#F5F4F1', 0.95), hb = it.style === 'tall' ? 0.14 : 0.1;
+    const frame = M(it.c2, 0.75), linen = M(it.c1, 0.95), white = M('#F5F4F1', 0.95), hb = it.style === 'tall' || it.style === 'savoir' ? 0.14 : 0.1;
+    if (it.style === 'savoir') {
+      // padded wing headboard
+      for (let k = 0; k < 7; k++) bx(g, w / 7 - 0.01, h - 0.3, 0.16, -w / 2 + (k + 0.5) * w / 7, 0.3, -d / 2 + 0.08, frame, 0.06);
+      for (const s of [-1, 1]) bx(g, 0.14, h - 0.35, 0.45, s * (w / 2 + 0.07), 0.3, -d / 2 + 0.25, frame, 0.06);
+    }
+    if (it.style === 'check') {
+      for (let k = 0; k < 12; k++) bx(g, 0.012, 0.302, d - hb + 0.004, -w / 2 + (k + 0.5) * w / 12, -0.001, hb / 2, M('#F2F2F2', 0.9), 0, false);
+    }
+    if (it.style === 'wood') legs4(g, w, d - hb, 0.12, 0.08, M(it.c2, 0.5), 0.03);
     bx(g, w, 0.3, d - hb, 0, 0, hb / 2, frame, 0.03);
     bx(g, w - 0.1, 0.24, d - hb - 0.1, 0, 0.3, hb / 2, white, 0.05);
     bx(g, w - 0.06, 0.07, (d - hb) * 0.6, 0, 0.53, d / 2 - (d - hb) * 0.3 - 0.03, linen, 0.03);
@@ -945,7 +1163,27 @@ const B = {
     bx(g, w, h * 0.62, 0.035, 0, e + 0.1, 0, M(it.c1, 0.15, 0.3));
     bx(g, w * 0.98, 0.1, 0.06, 0, e, 0.01, M(it.c2, 0.6, 0.3));
   },
+  tableOval(g, w, d, h, it) {
+    const base = M(it.c2, 0.6);
+    bx(g, w * 0.45, h - 0.04, 0.12, 0, 0, 0, base, 0.05);
+    bx(g, w * 0.5, 0.04, d * 0.5, 0, 0, 0, base, 0.02);
+    const top = cyl(g, 1, 1, 0.04, 0, h - 0.04, 0, new THREE.MeshStandardMaterial({ map: marbleTex, roughness: 0.18, color: it.c1 }), 64);
+    top.scale.set(w / 2, 1, d / 2);
+  },
+  lowTable(g, w, d, h, it) {
+    const stone = new THREE.MeshStandardMaterial({ map: marbleTex, roughness: 0.25, color: it.c1 });
+    if (it.style === 'round') cyl(g, w / 2, w / 2, 0.05, 0, h - 0.05, 0, stone, 48);
+    else bx(g, w, 0.05, d, 0, h - 0.05, 0, stone, 0.01);
+    bx(g, w * 0.55, h - 0.05, d * 0.55, 0, 0, 0, M(it.c2, 0.5, 0.3), 0.02);
+  },
   speaker(g, w, d, h, it) {
+    if (it.style === 'b90') {
+      const body = M(it.c1, 0.5, 0.2), fab = M('#3A3B3D', 0.95);
+      bx(g, w, h * 0.75, d, 0, 0, 0, fab, 0.04);
+      const top = bx(g, w * 0.9, h * 0.25, d * 0.7, 0, h * 0.72, -0.05, body, 0.04); top.rotation.x = -0.15;
+      bx(g, w + 0.02, 0.04, d + 0.02, 0, 0, 0, body);
+      return;
+    }
     cyl(g, w / 2 * 0.6, w / 2, h, 0, 0, 0, M(it.c1, 0.35, 0.7));
     cyl(g, w / 2 * 0.9, w / 2 * 0.6, 0.06, 0, h, 0, M('#888B8E', 0.3, 0.8));
   },
@@ -960,6 +1198,42 @@ const B = {
     bulb.rotation.x = Math.PI / 2; bulb.position.set(0, 1.99, 2.1); g.add(bulb);
   },
   pendant(g, w, d, h, it) {
+    if (it.style && it.style !== 'bocci') {
+      const glowM = M('#FFF6E6', 0.1, 0, { emissive: '#FFE7B8', emissiveIntensity: 1.5 }), metal = M(it.c2 || '#B08D57', 0.3, 0.9);
+      cyl(g, 0.08, 0.08, 0.03, 0, 2.97, 0, metal, 20);
+      if (it.style === 'branch') {
+        cyl(g, 0.012, 0.012, 0.8, 0, 2.17, 0, metal, 8);
+        const arms = [[0.45, 0.1, 2.15], [-0.4, 0.25, 2.25], [0.15, -0.5, 2.05], [-0.3, -0.35, 2.3], [0.5, -0.3, 2.35], [-0.55, 0.05, 2.0], [0.2, 0.45, 2.1], [0, 0, 1.95]];
+        for (const [x, z, y] of arms) {
+          const len = Math.hypot(x, z, y - 2.17);
+          const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, len, 6), metal);
+          arm.position.set(x / 2, (y + 2.17) / 2, z / 2);
+          arm.lookAt(x, y, z); arm.rotateX(Math.PI / 2); g.add(arm);
+          const s = new THREE.Mesh(new THREE.SphereGeometry(0.085, 24, 16), M('#F6EFE3', 0.25, 0, { emissive: '#FFE9C4', emissiveIntensity: 0.9 })); s.position.set(x, y, z); g.add(s);
+        }
+      } else if (it.style === 'cloud') {
+        cyl(g, 0.01, 0.01, 0.6, 0, 2.37, 0, metal, 8);
+        cyl(g, 0.45, 0.45, 0.012, 0, 2.36, 0, metal, 40);
+        for (let k = 0; k < 37; k++) {
+          const a = k * 2.399, r = 0.42 * Math.sqrt(k / 37);
+          const tube = cyl(g, 0.045, 0.045, 0.16 + (k % 4) * 0.05, r * Math.cos(a), 2.36 - 0.16 - (k % 4) * 0.05, r * Math.sin(a), M('#F3EEE6', 0.6, 0, { emissive: '#FFE4B8', emissiveIntensity: 0.55 }), 14);
+          tube.castShadow = false;
+        }
+      } else if (it.style === 'artichoke') {
+        cyl(g, 0.01, 0.01, 0.55, 0, 2.42, 0, metal, 8);
+        for (let row = 0; row < 12; row++) {
+          const y = 2.4 - row * 0.06, rad = 0.42 * Math.sin(Math.PI * (row + 1) / 13) + 0.05;
+          for (let k = 0; k < 6; k++) {
+            const a = (k + (row % 2) * 0.5) / 6 * Math.PI * 2;
+            const leaf = bx(g, 0.2, 0.004, 0.14, rad * Math.cos(a), y, rad * Math.sin(a), M(it.c1, 0.35, 0.6), 0, true);
+            leaf.rotation.y = -a; leaf.rotation.z = 0.5;
+          }
+        }
+        const core = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), glowM); core.position.set(0, 2.08, 0); g.add(core);
+      }
+      const L = new THREE.PointLight('#FFE2B0', 8, 7, 1.6); L.position.set(0, 1.9, 0); g.add(L);
+      return;
+    }
     const glow = M('#FFF6E6', 0.1, 0, { emissive: it.c1, emissiveIntensity: 1.6 }), glass = tGlass('#E8EEF0');
     glass.opacity = 0.35;
     for (const [x, z, y] of [[0, 0, 2.05], [0.32, 0.1, 2.2], [-0.3, 0.18, 2.12], [0.12, -0.34, 2.28], [-0.18, -0.26, 2.0], [0.38, -0.2, 2.1], [-0.42, -0.04, 2.25]]) {
@@ -1058,7 +1332,28 @@ const B = {
   },
 };
 
+
+/* ============================================================
+   7. STATE: language, choices, furniture meshes, labels
+   ============================================================ */
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+let LANG = store.get('g1d-lang', 'ko') === 'zh' ? 'zh' : 'ko';
+let PY = store.get('g1d-py', '0') === '1';
+const L = () => T[LANG];
+const tx = o => (o == null ? '' : typeof o === 'string' ? o : (o[LANG] || o.ko || ''));
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function validChoice(raw) {
+  const out = {};
+  for (const k in SLOTS) out[k] = raw && SLOTS[k].options.includes(raw[k]) ? raw[k] : SLOTS[k].options[0];
+  return out;
+}
+let localChoice = {};
+try { localChoice = JSON.parse(store.get('g1d-choice2', '{}')) || {}; } catch (e) { localChoice = {}; }
+CHOICE = validChoice(localChoice);
+ITEMS.forEach(it => { if (it.slot) applySlot(it); });
+
 const furnGroup = new THREE.Group(); scene.add(furnGroup);
+let selected = null;
 function buildItem(it) {
   if (it.group) { furnGroup.remove(it.group); it.group.traverse(o => { if (o.isCSS2DObject && o.element.parentNode) o.element.parentNode.removeChild(o.element); }); }
   const [w, d, h] = it.dims.map(v => v / 100);
@@ -1069,103 +1364,143 @@ function buildItem(it) {
   g.userData.item = it;
   const el = document.createElement('div'), inner = document.createElement('div');
   inner.className = 'fl' + (selected === it ? ' sel' : '');
-  inner.innerHTML = `${it.brand} <i>· ${it.model.split(' (')[0]}</i>`;
+  inner.innerHTML = `${esc(it.brand)} <i>· ${esc(it.model)}</i>`;
   el.appendChild(inner);
   const lab = new CSS2DObject(el);
-  lab.position.set(0, (it.type === 'pendant' ? 2.5 : it.type === 'arco' ? 1.3 : it.type === 'workstation' ? 1.3 : (it.elev || 0) + h) + 0.25, 0);
+  lab.position.set(0, (it.type === 'pendant' ? 2.5 : it.type === 'arco' || it.type === 'workstation' ? 1.3 : (it.elev || 0) + h) + 0.25, 0);
   g.add(lab);
   it.labelEl = inner; it.group = g;
   furnGroup.add(g);
 }
-let selected = null;
 ITEMS.forEach(buildItem);
 
+const roomLabels = [];
 for (const room of ROOMS) {
   if (!room.label) continue;
   const el = document.createElement('div');
   el.className = 'rl' + (room.dim ? ' dim' : '') + (room.changed ? ' changed' : '');
-  el.innerHTML = `<b>${room.ko}</b><span>${room.zh}${room.area ? ' · ' + room.area.toFixed(2) + '㎡' : ''}</span>`;
   const o = new CSS2DObject(el);
   o.position.set(room.label[0] * MM, 0.05, room.label[1] * MM);
   scene.add(o);
+  roomLabels.push({ room, el });
+}
+function renderRoomLabels() {
+  for (const { room, el } of roomLabels) {
+    const area = room.area ? room.area.toFixed(2) + '㎡' : '';
+    el.innerHTML = LANG === 'ko'
+      ? `<b>${room.ko}</b><span>${room.zh}${area ? ' · ' + area : ''}</span>${PY ? `<span class="py">${room.py}</span>` : ''}`
+      : `<b>${room.zh}</b>${PY ? `<span class="py">${room.py}</span>` : ''}<span>${area}</span>`;
+  }
 }
 buildWalls(false);
 
 /* ============================================================
-   7. PRICES, SELECTION, OPTIONS UI
+   8. MONEY
    ============================================================ */
-const usd = p => p && p.v != null ? p.v * (FX[p.cur] || 1) : 0;
-const fmtMoney = (v, cur) => (SYM[cur] || '') + Math.round(v).toLocaleString('en-US');
-const shortMoney = (v, cur) => (SYM[cur] || '') + (v >= 1000 ? (v / 1000).toFixed(v >= 100000 ? 0 : 1).replace(/\.0$/, '') + 'k' : v);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const krw = p => p && p.v != null ? p.v * (FX[p.cur] || 0) : 0;
+function fmtKRW(x, short = false) {
+  const ko = LANG === 'ko';
+  if (x >= 1e8) {
+    const v = x / 1e8, s = (v >= 100 ? v.toFixed(0) : v >= 10 ? v.toFixed(1) : v.toFixed(2)).replace(/\.?0+$/, '');
+    return s + (ko ? (short ? '억' : '억 원') : (short ? '亿' : '亿韩元'));
+  }
+  const m = Math.round(x / 1e4).toLocaleString('en-US');
+  return m + (ko ? (short ? '만' : '만 원') : (short ? '万' : '万韩元'));
+}
+const fmtOrig = p => p.cur === 'KRW' ? '' : (SYM[p.cur] || '') + Math.round(p.v).toLocaleString('en-US');
 function qtyOf(it) { if (!it.slot) return 1; return SLOTS[it.slot].per === 'set' ? 1 : ITEMS.filter(i => i.slot === it.slot).length; }
+function totalFor(choice) {
+  let total = 0, quote = 0, unknown = 0;
+  const seen = new Set();
+  for (const it of ITEMS) {
+    let price = it.price, key = it.id;
+    if (it.slot) { price = PRODUCTS[choice[it.slot]].price; if (SLOTS[it.slot].per === 'set') key = 'slot:' + it.slot; }
+    if (seen.has(key)) continue; seen.add(key);
+    if (!price) unknown++; else if (price.v == null) quote++; else total += krw(price);
+  }
+  return { total, quote, unknown };
+}
+
+/* ============================================================
+   9. PANEL UI
+   ============================================================ */
+function catHTML(it) {
+  const c = CAT[it.cat] || [it.cat, it.cat, ''];
+  const side = it.side && SIDE[it.side] ? ' ' + SIDE[it.side][LANG === 'ko' ? 0 : 1] : '';
+  if (LANG === 'ko') return esc(c[0] + side) + (PY ? ` · ${c[1]} <span class="py">${c[2]}</span>` : '');
+  return esc(c[1] + side) + (PY ? ` <span class="py">${c[2]}</span>` : '');
+}
+function roomName(room) { return LANG === 'ko' ? `${room.ko} <span class="muted">${room.zh}</span>` : `${room.zh}${PY ? ` <span class="py">${room.py}</span>` : ''}`; }
 function priceBlock(it) {
-  const p = it.price, q = qtyOf(it);
-  const link = it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">상품 · 가격 페이지 ↗</a>` : '';
-  if (!p) return `<div class="price"><div class="pnote">가격 미조사: 매장 문의가 필요합니다.</div>${link ? `<div class="links">${link}</div>` : ''}</div>`;
-  if (p.v == null) return `<div class="price"><div class="big">견적<small>공개 정가 없음</small></div><div class="pnote">${esc(p.note)}</div><div class="links">${link}</div></div>`;
-  const conv = p.cur !== 'USD' ? `≈ ${fmtMoney(usd(p), 'USD')}` : '';
-  const total = q > 1 ? `<div class="pnote">× ${q}개 = ${fmtMoney(p.v * q, p.cur)}${p.cur !== 'USD' ? ` (≈ ${fmtMoney(usd(p) * q, 'USD')})` : ''}</div>` : '';
-  return `<div class="price"><div class="big">${fmtMoney(p.v, p.cur)}<small>${conv}${q > 1 ? ' · 개당' : ''}</small></div>${total}<div class="pnote">${esc(p.note)}</div><div class="links">${link}</div></div>`;
+  const p = it.price, q = qtyOf(it), t = L();
+  const link = it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${t.link}</a>` : '';
+  if (!p) return `<div class="price"><div class="pnote">${t.noPrice}</div>${link ? `<div class="links">${link}</div>` : ''}</div>`;
+  if (p.v == null) return `<div class="price"><div class="big">${t.quote}<small>${t.quoteSub}</small></div><div class="pnote">${esc(tx(p.note))}</div><div class="links">${link}</div></div>`;
+  const orig = fmtOrig(p);
+  const total = q > 1 ? `<div class="pnote">${t.times} ${q} = ${fmtKRW(krw(p) * q)}</div>` : '';
+  return `<div class="price"><div class="big">${fmtKRW(krw(p))}<small>${orig}${q > 1 ? ' · ' + t.perUnit : ''}</small></div>${total}<div class="pnote">${esc(tx(p.note))}</div><div class="links">${link}</div></div>`;
 }
 const detail = document.getElementById('detail');
 const roomById = Object.fromEntries(ROOMS.map(r => [r.id, r]));
-function renderDetail(it) {
-  const room = roomById[it.room];
-  const slot = it.slot ? SLOTS[it.slot] : null;
-  const opts = slot && slot.options.length > 1 ? `<div class="opts" role="radiogroup" aria-label="${esc(slot.label)} 옵션">
-      <div class="h">${esc(slot.label)} 옵션 ${slot.options.length}개 · 고르면 3D와 합계가 바로 바뀝니다</div>
-      ${slot.options.map((o, i) => `<button type="button" class="opt" role="radio" id="opt-${it.slot}-${i}" data-i="${i}" aria-checked="${CHOICE[it.slot] === i}">
+function renderDetail() {
+  const it = selected; if (!it) return;
+  const t = L(), room = roomById[it.room], slot = it.slot ? SLOTS[it.slot] : null;
+  const shop = SHOPS[it.brand];
+  const opts = slot && slot.options.length > 1 ? `<div class="opts" role="radiogroup" aria-label="${esc(slot.label[LANG === 'ko' ? 0 : 1])}">
+      <div class="h">${t.optH(slot.label[LANG === 'ko' ? 0 : 1], slot.options.length)}</div>
+      ${slot.options.map(pid => { const o = PRODUCTS[pid]; return `<button type="button" class="opt" role="radio" id="opt-${it.slot}-${pid}" data-pid="${pid}" aria-checked="${CHOICE[it.slot] === pid}">
         <span class="dot"></span><span class="t">${esc(o.brand)} <span>${esc(o.model)}</span></span>
-        <span class="p">${o.price && o.price.v != null ? shortMoney(o.price.v, o.price.cur) : '견적'}</span></button>`).join('')}
+        <span class="p">${o.price && o.price.v != null ? fmtKRW(krw(o.price), true) : t.quote}</span>
+        ${o.designer ? `<span class="s">${esc(o.designer)}</span>` : ''}</button>`; }).join('')}
     </div>` : '';
   detail.innerHTML = `
-    <div class="top"><span class="pill ${it.fixed ? 'fixed' : 'prop'}">${it.fixed ? '확정' : '제안'}</span><span class="pill">${esc(it.cat)}</span>${slot && slot.options.length > 1 ? `<span class="pill">옵션 ${slot.options.length}</span>` : ''}</div>
+    <div class="top"><span class="pill ${it.fixed ? 'fixed' : 'prop'}">${it.fixed ? t.fixed : t.prop}</span><span class="pill">${catHTML(it)}</span>${slot && slot.options.length > 1 ? `<span class="pill">${t.optCount(slot.options.length)}</span>` : ''}</div>
     <div><div class="brand">${esc(it.brand)}</div><div class="model">${esc(it.model)}</div></div>
     <dl class="kv">
-      ${it.designer ? `<dt>디자이너</dt><dd>${esc(it.designer)}</dd>` : ''}
-      <dt>치수</dt><dd class="mono">W ${it.dims[0]} × D ${it.dims[1]} × H ${it.dims[2]} cm</dd>
-      <dt>위치</dt><dd>${esc(room.ko)} <span class="muted">${esc(room.zh)}</span></dd>
+      ${it.designer ? `<dt>${t.designer}</dt><dd>${esc(it.designer)}</dd>` : ''}
+      <dt>${t.dims}</dt><dd class="mono">W ${it.dims[0]} × D ${it.dims[1]} × H ${it.dims[2]} cm</dd>
+      ${it.mat ? `<dt>${t.material}</dt><dd>${esc(tx(it.mat))}</dd>` : ''}
+      ${it.lead ? `<dt>${t.lead}</dt><dd>${esc(tx(it.lead))}</dd>` : ''}
+      <dt>${t.where}</dt><dd>${roomName(room)}</dd>
     </dl>
     ${priceBlock(it)}
+    <div class="shop"><b>${t.shop}</b>${shop ? `<span>${esc(shop[LANG])}</span><span class="muted">${t.mapSearch}: ${esc(shop.q)}</span>` : `<span class="muted">${t.shopNone}</span>`}</div>
     ${opts}
-    ${it.why ? `<div class="note">${esc(it.why)}</div>` : ''}`;
-  detail.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => chooseOption(it.slot, +b.dataset.i)));
-}
-function chooseOption(slot, i) {
-  CHOICE[slot] = i; saveChoice();
-  for (const it of ITEMS.filter(x => x.slot === slot)) { applySlot(it); buildItem(it); }
-  if (selected) select(selected, false);
-  renderSchedule(); renderStats();
+    ${it.why ? `<div class="note">${esc(tx(it.why))}</div>` : ''}`;
+  detail.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => chooseOption(it.slot, b.dataset.pid)));
 }
 const accentColor = () => new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#86653A');
 const selBox = new THREE.Box3Helper(new THREE.Box3(), accentColor());
 selBox.visible = false; scene.add(selBox);
+function markRows() {
+  document.querySelectorAll('.items button').forEach(b => {
+    const r = ITEMS.find(x => x.id === b.dataset.id);
+    const same = r && selected && (r === selected || (selected.slot && r.slot === selected.slot && r.room === selected.room));
+    b.setAttribute('aria-current', same ? 'true' : 'false');
+  });
+}
 function select(it, fly = false) {
   if (selected && selected.labelEl) selected.labelEl.classList.remove('sel');
   selected = it;
-  document.querySelectorAll('.items button').forEach(b => {
-    const rowItem = ITEMS.find(x => x.id === b.dataset.id);
-    const same = rowItem === it || (it.slot && rowItem && rowItem.slot === it.slot && rowItem.room === it.room) || (!it.slot && rowItem && rowItem.brand === it.brand && rowItem.model === it.model && rowItem.room === it.room && rowItem.type === it.type);
-    b.setAttribute('aria-current', same ? 'true' : 'false');
-  });
   it.labelEl.classList.add('sel');
   selBox.box.setFromObject(it.group, true);
   selBox.material.color.copy(accentColor());
   selBox.visible = true;
-  renderDetail(it);
+  renderDetail(); markRows();
   if (fly) focusItem(it);
 }
 
 const scheduleEl = document.getElementById('schedule');
 const ORDER = ['living', 'family', 'bed2', 'master', 'cloak', 'mbath', 'bed3', 'bed4', 'kitchen', 'foyer', 'lift', 'balcony', 'bath1', 'bath2', 'bath3', 'equip'];
 function renderSchedule() {
+  const t = L();
   scheduleEl.innerHTML = '';
   for (const rid of ORDER) {
     const list = ITEMS.filter(i => i.room === rid); if (!list.length) continue;
     const room = roomById[rid];
     const sec = document.createElement('div'); sec.className = 'room';
-    sec.innerHTML = `<div class="room-h"><b>${esc(room.ko)}${room.changed ? '<em>용도 변경</em>' : ''}</b><span>${esc(room.zh)}${room.area ? ' · ' + room.area.toFixed(2) + '㎡' : ''}</span></div>`;
+    const area = room.area ? ' · ' + room.area.toFixed(2) + '㎡' : '';
+    sec.innerHTML = `<div class="room-h"><b>${LANG === 'ko' ? room.ko : room.zh}${room.changed ? `<em>${t.changedRoom}</em>` : ''}</b><span>${LANG === 'ko' ? room.zh : (PY ? room.py : '')}${area}</span></div>`;
     const ul = document.createElement('ul'); ul.className = 'items';
     const seen = new Map();
     for (const it of list) {
@@ -1174,36 +1509,151 @@ function renderSchedule() {
       seen.set(key, { it, count: 1 });
     }
     for (const { it, count } of seen.values()) {
-      const nOpt = it.slot ? SLOTS[it.slot].options.length : 1;
-      const p = it.price;
+      const nOpt = it.slot ? SLOTS[it.slot].options.length : 1, p = it.price;
       const q = it.slot ? qtyOf(it) : count;
-      const priceTxt = !p ? '—' : p.v == null ? '견적' : shortMoney(p.v * q, p.cur);
+      const priceTxt = !p ? '—' : p.v == null ? t.quote : fmtKRW(krw(p) * q, true);
       const li = document.createElement('li'), b = document.createElement('button');
       b.id = 'item-' + it.id; b.dataset.id = it.id;
-      b.innerHTML = `<span class="b">${it.fixed ? '<span class="star">★ </span>' : ''}${esc(it.brand)} <span class="m">${esc(it.model.split(' (')[0])}</span></span>
-        <span class="c">${esc(it.cat)}${count > 1 ? ' × ' + count : ''}${nOpt > 1 ? ` · <span class="o">옵션 ${nOpt}</span>` : ''}</span>
+      const c = CAT[it.cat] || [it.cat, it.cat];
+      b.innerHTML = `<span class="b">${it.fixed ? '<span class="star">★ </span>' : ''}${esc(it.brand)} <span class="m">${esc(it.model)}</span></span>
+        <span class="c">${esc(c[LANG === 'ko' ? 0 : 1])}${count > 1 ? ' × ' + count : ''}${nOpt > 1 ? ` · <span class="o">${t.optCount(nOpt)}</span>` : ''}</span>
         <span class="d${!p || p.v == null ? ' q' : ''}">${priceTxt}</span>`;
       b.addEventListener('click', () => select(it, true));
       li.appendChild(b); ul.appendChild(li);
     }
     sec.appendChild(ul); scheduleEl.appendChild(sec);
   }
-  if (selected) document.querySelectorAll('.items button').forEach(b => b.setAttribute('aria-current', b.dataset.id === selected.id ? 'true' : 'false'));
+  markRows();
 }
 function renderStats() {
-  let total = 0, quote = 0, unknown = 0;
-  const counted = new Set();
-  for (const it of ITEMS) {
-    const key = it.slot && SLOTS[it.slot].per === 'set' ? 'slot:' + it.slot : it.id;
-    if (counted.has(key)) continue; counted.add(key);
-    if (!it.price) unknown++; else if (it.price.v == null) quote++; else total += usd(it.price);
-  }
+  const t = L(), r = totalFor(CHOICE);
   document.getElementById('stats').innerHTML = `
-    <div class="stat"><b>≈ $${(total / 1000).toFixed(0)}k</b><span>공개가 합계 (USD 환산)</span></div>
-    <div class="stat"><b>${quote}</b><span>견적 품목 (합계 제외)</span></div>
-    <div class="stat"><b>${ITEMS.length}</b><span>배치 가구·설비 · 브랜드 ${new Set(ITEMS.map(i => i.brand)).size}</span></div>`;
+    <div class="stat"><b>${fmtKRW(r.total, true)}</b><span>${t.statTotal}</span></div>
+    <div class="stat"><b>${r.quote}</b><span>${t.statQuote}</span></div>
+    <div class="stat"><b>${ITEMS.length}</b><span>${t.statCount(ITEMS.length, new Set(ITEMS.map(i => i.brand)).size)}</span></div>`;
 }
-renderSchedule(); renderStats();
+const packsEl = document.getElementById('packs');
+function renderPacks() {
+  const t = L();
+  packsEl.innerHTML = PACKAGES.map(p => {
+    const choice = { ...CHOICE, ...p.pick }, r = totalFor(choice);
+    const on = Object.entries(p.pick).every(([k, v]) => CHOICE[k] === v);
+    return `<button type="button" class="pack" id="pack-${p.id}" data-pack="${p.id}" aria-pressed="${on}"><b>${LANG === 'ko' ? p.ko : p.zh}</b><span>≈ ${fmtKRW(r.total, true)}</span><small>${p.desc[LANG === 'ko' ? 0 : 1]}</small></button>`;
+  }).join('') ;
+  packsEl.title = t.packKeep;
+  packsEl.querySelectorAll('.pack').forEach(b => b.addEventListener('click', () => {
+    const p = PACKAGES.find(x => x.id === b.dataset.pack);
+    applyChoices({ ...CHOICE, ...p.pick }, true);
+  }));
+}
+function renderAll() { renderDetail(); renderSchedule(); renderStats(); renderPacks(); renderPlans(); }
+
+/* ============================================================
+   10. CHOICES + SHARED PLANS (db capability; falls back to this device)
+   ============================================================ */
+function applyChoices(next, persist) {
+  next = validChoice(next);
+  const changed = Object.keys(SLOTS).filter(k => next[k] !== CHOICE[k]);
+  CHOICE = next;
+  for (const it of ITEMS.filter(x => x.slot && changed.includes(x.slot))) { applySlot(it); buildItem(it); }
+  if (selected) { selected.labelEl.classList.add('sel'); selBox.box.setFromObject(selected.group, true); }
+  if (persist) persistChoice();
+  renderAll();
+}
+function chooseOption(slot, pid) { applyChoices({ ...CHOICE, [slot]: pid }, true); }
+
+let db = null, plansCol = null, planDocs = [], planState = 'loading';
+let activePlan = store.get('g1d-plan', '');
+let writeChain = Promise.resolve();
+const planSelect = document.getElementById('plan-select'), planName = document.getElementById('plan-name');
+const planStatus = document.getElementById('plan-status');
+function persistChoice() {
+  store.set('g1d-choice2', JSON.stringify(CHOICE));
+  if (!db || !activePlan || planState === 'readonly') return;
+  const ref = plansCol.doc(activePlan), body = { choice: { ...CHOICE }, updatedAt: new Date().toISOString() };
+  planStatus.textContent = L().planSaving;
+  writeChain = writeChain.then(() => ref.update(body)).then(() => renderPlans()).catch(onWriteError);
+}
+function onWriteError(e) {
+  if (e && (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')) planState = 'readonly';
+  else planState = 'offline';
+  renderPlans();
+}
+function renderPlans() {
+  const t = L();
+  planName.placeholder = t.planPlaceholder;
+  const opts = [`<option value="">${esc(t.planDefault)}</option>`].concat(planDocs.map(p => `<option value="${esc(p.id)}"${p.id === activePlan ? ' selected' : ''}>${esc(p.name)}</option>`));
+  planSelect.innerHTML = opts.join('');
+  if (!planDocs.some(p => p.id === activePlan)) planSelect.value = '';
+  const canWrite = db && planState !== 'readonly' && planState !== 'offline';
+  document.getElementById('plan-save').disabled = !canWrite;
+  document.getElementById('plan-rename').disabled = !canWrite || !activePlan;
+  let msg = t.planLocal, ok = false;
+  if (planState === 'loading') msg = t.planLoading;
+  else if (planState === 'readonly') msg = t.planReadOnly;
+  else if (planState === 'offline' || !db) msg = t.planOffline;
+  else if (!planDocs.length) msg = t.planNone;
+  else if (activePlan) { msg = t.planShared; ok = true; }
+  planStatus.textContent = msg;
+  planStatus.className = 'plan-status' + (ok ? ' ok' : '');
+}
+planSelect.addEventListener('change', () => {
+  activePlan = planSelect.value; store.set('g1d-plan', activePlan);
+  const p = planDocs.find(x => x.id === activePlan);
+  applyChoices(p ? p.choice : localChoice, false);
+});
+document.getElementById('plan-save').addEventListener('click', async () => {
+  if (!db) return;
+  const name = (planName.value.trim() || (LANG === 'ko' ? `안 ${planDocs.length + 1}` : `方案 ${planDocs.length + 1}`)).slice(0, 40);
+  const now = new Date().toISOString();
+  try {
+    planStatus.textContent = L().planSaving;
+    const ref = plansCol.doc();
+    await ref.set({ name, choice: { ...CHOICE }, createdAt: now, updatedAt: now });
+    activePlan = ref.id; store.set('g1d-plan', activePlan); planName.value = '';
+    planDocs = planDocs.filter(p => p.id !== ref.id).concat([{ id: ref.id, name, choice: { ...CHOICE } }]);
+    renderPlans();
+  } catch (e) { onWriteError(e); }
+});
+document.getElementById('plan-rename').addEventListener('click', async () => {
+  const name = planName.value.trim().slice(0, 40);
+  if (!db || !activePlan || !name) { planName.focus(); return; }
+  try { await plansCol.doc(activePlan).update({ name, updatedAt: new Date().toISOString() }); planName.value = ''; } catch (e) { onWriteError(e); }
+});
+(async () => {
+  const timer = setTimeout(() => { if (planState === 'loading') { planState = 'offline'; renderPlans(); } }, 10000);
+  try { db = window.claude && window.claude.use ? await window.claude.use('db') : null; } catch (e) { db = null; }
+  if (!db) { clearTimeout(timer); planState = 'offline'; renderPlans(); return; }
+  plansCol = db.collection('plans');
+  plansCol.onSnapshot(snap => {
+    if (!snap.metadata.fromCache) clearTimeout(timer);
+    if (planState === 'loading' && !snap.metadata.fromCache) planState = 'ready';
+    planDocs = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.name).sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+    const p = planDocs.find(x => x.id === activePlan);
+    if (p && p.choice && JSON.stringify(validChoice(p.choice)) !== JSON.stringify(CHOICE)) applyChoices(p.choice, false);
+    else renderPlans();
+  }, () => { clearTimeout(timer); planState = 'offline'; renderPlans(); });
+})();
+
+/* ============================================================
+   11. LANGUAGE SWITCH
+   ============================================================ */
+function setLang(lang) {
+  LANG = lang === 'zh' ? 'zh' : 'ko'; store.set('g1d-lang', LANG);
+  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'ko';
+  const t = L();
+  document.querySelectorAll('[data-t]').forEach(el => { const v = t[el.dataset.t]; if (typeof v === 'string') el.innerHTML = v; });
+  document.querySelectorAll('[data-view]').forEach(b => { b.textContent = t[b.dataset.view]; });
+  document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG ? 'true' : 'false'));
+  document.getElementById('foot').innerHTML = t.foot.map(p => `<p>${p}</p>`).join('');
+  renderRoomLabels(); renderAll();
+}
+document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+const pyBox = document.getElementById('t-pinyin');
+pyBox.checked = PY;
+pyBox.addEventListener('change', () => { PY = pyBox.checked; store.set('g1d-py', PY ? '1' : '0'); renderRoomLabels(); renderAll(); });
+
+setLang(LANG);
 
 /* ============================================================
    8. CAMERA: orbit views + walk mode
@@ -1277,7 +1727,7 @@ function stepWalk(forward, strafe) {
   const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
   const nx = camera.position.x + fx * forward + (-fz) * strafe, nz = camera.position.z + fz * forward + fx * strafe;
   if (walkable(nx, nz)) { walkTween = null; camera.position.x = nx; camera.position.z = nz; }
-  else toast('벽이나 창 밖으로는 나갈 수 없어요');
+  else toast(T[LANG].toastWall);
 }
 
 function focusItem(it) {
@@ -1319,7 +1769,7 @@ function walkTarget(ev) {
 }
 function onDouble(ev) {
   const p = walkTarget(ev);
-  if (!p) { toast('바닥이나 가구 쪽을 더블클릭하세요'); return; }
+  if (!p) { toast(T[LANG].toastFloor); return; }
   if (mode === 'walk') walkTo(p.x, p.z);
   else enterWalk(p.x, p.z);
 }
@@ -1412,5 +1862,5 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-window.__g1d = { setView, enterWalk, chooseOption, ITEMS, select };
+window.__g1d = { setView, enterWalk, chooseOption, ITEMS, select, applyChoices, setLang };
 </script>
