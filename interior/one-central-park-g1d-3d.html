@@ -119,6 +119,16 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
 .pack span { font-family: var(--font-mono); font-size: 12px; }
 .pack small { font-size: 11px; color: var(--muted); }
 
+.gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.gallery button { border: 0; padding: 0; background: none; cursor: zoom-in; text-align: left; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.gallery img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 7px; border: 1px solid var(--line); background: var(--chip); }
+.gallery span { font-size: 11.5px; color: var(--muted); }
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(10, 12, 14, 0.92); display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.lightbox figure { margin: 0; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.lightbox img { max-width: 100%; max-height: 82vh; border-radius: 8px; }
+.lightbox figcaption { color: #E8EBED; font-size: 13px; text-align: center; }
+.lightbox button { position: absolute; top: max(14px, env(safe-area-inset-top, 0px)); right: max(14px, env(safe-area-inset-right, 0px)); border: 0; border-radius: 50%; width: 38px; height: 38px; background: #E8EBED; color: #14171A; font-size: 16px; cursor: pointer; }
 .card { border: 1px solid var(--line); border-radius: 10px; padding: 14px 15px; background: var(--bg); display: flex; flex-direction: column; gap: 11px; }
 .card .top { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .pill { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--chip); color: var(--muted); }
@@ -278,11 +288,20 @@ h1 { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter
       <div class="stats" id="stats"></div>
     </section>
     <section>
+      <h2 class="sec-h" data-t="renderH"></h2>
+      <div class="gallery" id="gallery"></div>
+    </section>
+    <section>
       <h2 class="sec-h" data-t="scheduleH"></h2>
       <div id="schedule"></div>
     </section>
     <section class="foot" id="foot"></section>
   </aside>
+</div>
+
+<div class="lightbox" id="lightbox" hidden>
+  <figure><img id="lb-img" alt=""><figcaption id="lb-cap"></figcaption></figure>
+  <button type="button" id="lb-close" aria-label="close">✕</button>
 </div>
 
 <script type="importmap">
@@ -340,7 +359,7 @@ const T = {
   ko: {
     title: '壹號院 G1-D 가구 배치', walk: '걷기', overview: '전체', top: '평면', living: '거실', study: '서재', master: '마스터', closet: '드레스룸',
     wallsFull: '벽 전체 높이', labelsAll: '브랜드 라벨 전부', pinyin: '병음 표시',
-    editToggle: '배치 편집', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '이 가구 원위치', resetAll: '전체 원위치', editPick: '가구를 눌러 선택하세요',
+    renderH: '사진급 렌더링 · Blender Cycles', editToggle: '배치 편집', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '이 가구 원위치', resetAll: '전체 원위치', editPick: '가구를 눌러 선택하세요',
     editHint: '<b>배치 편집</b> · 가구를 끌어서 이동 · 아래 버튼으로 회전 · 빈 곳 드래그: 화면 회전', editBlocked: '벽 밖이나 창 밖으로는 옮길 수 없어요', editSaved: '배치 저장됨',
     walkbar: '<b>1인칭</b> · 바닥 화살표 클릭: 그 지점으로 이동 · 드래그: 둘러보기 · 휠 / W·S: 앞뒤', walkExit: '전체 보기로',
     hint: '<b>더블클릭</b>: 마네킹이 그 자리로 걸어감 · 드래그: 회전 · 휠: 확대 · 가구 클릭: 상세·옵션',
@@ -365,7 +384,7 @@ const T = {
   zh: {
     title: '壹號院 G1-D 家具布置', walk: '漫游', overview: '全景', top: '平面', living: '客厅', study: '书房', master: '主卧', closet: '衣帽间',
     wallsFull: '墙体全高', labelsAll: '显示全部品牌', pinyin: '显示拼音',
-    editToggle: '编辑布局', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '此家具复位', resetAll: '全部复位', editPick: '请点击选择家具',
+    renderH: '效果图 · Blender Cycles', editToggle: '编辑布局', rotL: '⟲ 15°', rotR: '⟳ 15°', rot90: '↻ 90°', resetOne: '此家具复位', resetAll: '全部复位', editPick: '请点击选择家具',
     editHint: '<b>编辑布局</b> · 拖动家具移动 · 用下方按钮旋转 · 拖动空白处：旋转视角', editBlocked: '不能移到墙外或窗外', editSaved: '布局已保存',
     walkbar: '<b>第一人称</b> · 点击地面箭头：移动到该位置 · 拖动：环视 · 滚轮 / W·S：前后移动', walkExit: '返回全景',
     hint: '<b>双击</b>：人偶走到该位置 · 拖动：旋转 · 滚轮：缩放 · 点击家具：详情与选项',
@@ -797,6 +816,34 @@ function M(color, rough = 0.7, metal = 0, extra = {}) {
 }
 const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xa9c6d3, roughness: 0.05, metalness: 0, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide });
 const chrome = () => M('#C8CCCF', 0.22, 0.95);
+// fabric: sheen + fine weave normal map; leather: low roughness with grain normal
+function weaveTex(seed, fine) {
+  return canvasTex(256, (g, s) => {
+    const r = rnd(seed); g.fillStyle = 'rgb(128,128,255)'; g.fillRect(0, 0, s, s);
+    for (let k = 0; k < (fine ? 9000 : 4000); k++) {
+      const v = 128 + (r() - 0.5) * (fine ? 60 : 90);
+      g.fillStyle = `rgb(${v},${256 - v},255)`; g.fillRect(r() * s, r() * s, fine ? 1 : 2, fine ? 3 : 2);
+    }
+  }, fine ? 0.08 : 0.15);
+}
+let _weave = null, _grain = null;
+const fabricCache = new Map();
+function F(color) {
+  if (!fabricCache.has(color)) {
+    _weave = _weave || weaveTex(17, true); _weave.colorSpace = THREE.NoColorSpace;
+    const c = new THREE.Color(color);
+    fabricCache.set(color, new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.92, sheen: 1, sheenRoughness: 0.55, sheenColor: c.clone().lerp(new THREE.Color('#ffffff'), 0.35), normalMap: _weave, normalScale: new THREE.Vector2(0.35, 0.35) }));
+  }
+  return fabricCache.get(color);
+}
+const leatherCache = new Map();
+function LE(color) {
+  if (!leatherCache.has(color)) {
+    _grain = _grain || weaveTex(29, false); _grain.colorSpace = THREE.NoColorSpace;
+    leatherCache.set(color, new THREE.MeshPhysicalMaterial({ color, roughness: 0.42, clearcoat: 0.25, clearcoatRoughness: 0.5, normalMap: _grain, normalScale: new THREE.Vector2(0.25, 0.25) }));
+  }
+  return leatherCache.get(color);
+}
 const darkMetal = () => M('#2A2C2E', 0.4, 0.6);
 function canvasTex(size, draw, repeatM) {
   const c = document.createElement('canvas'); c.width = c.height = size;
@@ -1002,6 +1049,7 @@ function buildWalls(full) {
     wallGroup.add(segBox(seg, H - 2.25, 0.12, 2.25, wallMatInt));
   }
   wallGroup.add(coreDetails(H));
+  if (typeof tallDecor !== 'undefined' && tallDecor) tallDecor.scale.y = H / 3.0;
 }
 
 /* ============================================================
@@ -1020,7 +1068,7 @@ const tGlass = c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.06, 
 const legs4 = (g, w, d, h, inset, mat, r = 0.012) => { for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) cyl(g, r, r, h, sx * (w / 2 - inset), 0, sz * (d / 2 - inset), mat, 10); };
 const B = {
   sofaL(g, w, d, h, it) {
-    const fab = M(it.c1, it.style === 'chester' ? 0.45 : 0.95), base = M(it.c2, 0.95), D = 1.05, z0 = -d / 2;
+    const fab = it.style === 'chester' ? LE(it.c1) : F(it.c1), base = F(it.c2), D = 1.05, z0 = -d / 2;
     if (it.style === 'chester') {
       // tight tufted leather: low back flush with rolled arms, button grid
       const btn = M(it.c2, 0.4);
@@ -1061,7 +1109,7 @@ const B = {
     bx(g, 0.45, 0.4, 0.15, -w / 2 + 0.95, 0.33, z0 + 0.4, M('#E4DED3', 0.95), 0.07);
   },
   armchair(g, w, d, h, it) {
-    const c = M(it.c1, it.style === 'archibald' || it.style === 'vanity' ? 0.55 : 0.92);
+    const c = it.style === 'archibald' || it.style === 'vanity' || it.style === 'egg' ? LE(it.c1) : F(it.c1);
     if (it.style === 'egg') {
       const met = chrome();
       cyl(g, 0.3, 0.3, 0.02, 0, 0, 0, met); cyl(g, 0.03, 0.03, 0.33, 0, 0.02, 0, met);
@@ -1139,7 +1187,7 @@ const B = {
     bx(g, w * 0.9, h - 0.72, 0.07, 0, 0.72, -d / 2 + 0.07, M(it.c1, 0.95), 0.03);
   },
   bed(g, w, d, h, it) {
-    const frame = M(it.c2, 0.75), linen = M(it.c1, 0.95), white = M('#F5F4F1', 0.95), hb = it.style === 'tall' || it.style === 'savoir' ? 0.14 : 0.1;
+    const frame = F(it.c2), linen = F(it.c1), white = F('#F5F4F1'), hb = it.style === 'tall' || it.style === 'savoir' ? 0.14 : 0.1;
     if (it.style === 'savoir') {
       // padded wing headboard
       for (let k = 0; k < 7; k++) bx(g, w / 7 - 0.01, h - 0.3, 0.16, -w / 2 + (k + 0.5) * w / 7, 0.3, -d / 2 + 0.08, frame, 0.06);
@@ -1368,7 +1416,37 @@ const B = {
   },
 };
 
-
+/* ---------- decor that the photoreal renders use too: walnut TV wall, sheer curtains, fiddle-leaf figs ---------- */
+const decor = new THREE.Group(); scene.add(decor);
+var tallDecor = new THREE.Group(); decor.add(tallDecor);   // follows the wall-height toggle
+{
+  const walnut = M('#6B4A33', 0.45), dark = M('#1D1E20', 0.5);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(3.05, 2.8, 0.02), dark); back.position.set(14.8, 1.4, 14.64); tallDecor.add(back);
+  for (let i = 0; i < 30; i++) { const s = new THREE.Mesh(new THREE.BoxGeometry(0.07, 2.8, 0.03), walnut); s.position.set(13.3 + i * 0.1 + 0.035, 1.4, 14.615); s.castShadow = true; s.receiveShadow = true; tallDecor.add(s); }
+  const sheer = new THREE.MeshPhysicalMaterial({ color: '#F1ECE3', roughness: 0.9, transmission: 0.6, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false });
+  const curtain = (x, y0, y1) => {
+    const n = 48, geo = new THREE.PlaneGeometry(y1 - y0, 2.85, n, 1), p = geo.attributes.position;
+    for (let k = 0; k < p.count; k++) p.setZ(k, Math.sin(p.getX(k) * 28) * 0.05);
+    geo.computeVertexNormals();
+    const m = new THREE.Mesh(geo, sheer); m.rotation.y = -Math.PI / 2; m.position.set(x, 1.47, (y0 + y1) / 2); tallDecor.add(m);
+  };
+  curtain(17.02, 4.7, 6.2); curtain(17.02, 9.4, 10.6); curtain(17.02, 13.4, 14.5);
+  curtain(17.82, 18.7, 19.9);
+  const leafM = new THREE.MeshStandardMaterial({ color: '#2F5A2A', roughness: 0.45, side: THREE.DoubleSide });
+  const plant = (x, z, h, seed) => {
+    const r = rnd(seed), g = new THREE.Group();
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.24, 0.42, 32), M('#D7D3CC', 0.8)); pot.position.y = 0.21; pot.castShadow = true; g.add(pot);
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.018, h - 0.4, 8), M('#5A3E2B', 0.7)); trunk.position.y = 0.4 + (h - 0.4) / 2; g.add(trunk);
+    for (let k = 0; k < 40; k++) {
+      const t = 0.45 + r() * 0.55, a = r() * Math.PI * 2, rr = 0.08 + 0.3 * (1 - Math.abs(t - 0.75)) * r();
+      const leaf = new THREE.Mesh(new THREE.CircleGeometry(0.12, 12), leafM);
+      leaf.scale.set(1, 0.55, 1); leaf.position.set(rr * Math.cos(a), 0.4 + (h - 0.4) * t, rr * Math.sin(a));
+      leaf.rotation.set(-Math.PI / 2 + (r() - 0.5) * 1.2, a, (r() - 0.5) * 0.8); leaf.castShadow = true; g.add(leaf);
+    }
+    g.position.set(x, 0, z); decor.add(g);
+  };
+  plant(16.75, 10.0, 1.95, 3); plant(13.35, 14.05, 1.7, 7); plant(17.55, 19.0, 1.8, 11); plant(14.2, 0.75, 1.7, 21);
+}
 /* ============================================================
    7. STATE: language, choices, furniture meshes, labels
    ============================================================ */
@@ -1598,7 +1676,28 @@ function renderPacks() {
     applyChoices({ ...CHOICE, ...p.pick }, true);
   }));
 }
-function renderAll() { renderDetail(); renderSchedule(); renderStats(); renderPacks(); renderPlans(); }
+const RENDERS = [
+  { f: 'renders/living_a.jpg', ko: '거실 · 현관에서 동쪽 창 방향', zh: '客厅 · 从玄关望向东侧落地窗' },
+  { f: 'renders/living_b.jpg', ko: '거실 · 소파 너머 다이닝과 아일랜드', zh: '客厅 · 越过沙发看餐厅与中岛' },
+  { f: 'renders/living_c.jpg', ko: '다이닝 · 서양식 주방', zh: '餐厅 · 西厨' },
+  { f: 'renders/master.jpg', ko: '마스터 침실', zh: '主卧' },
+  { f: 'renders/study.jpg', ko: '서재', zh: '书房' },
+  { f: 'renders/closet.jpg', ko: '아내 드레스룸', zh: '夫人衣帽间' },
+];
+const gallery = document.getElementById('gallery'), lightbox = document.getElementById('lightbox');
+function renderGallery() {
+  gallery.innerHTML = RENDERS.map((r, i) => `<button type="button" id="render-${i}" data-i="${i}"><img src="${r.f}" alt="${esc(r[LANG])}" loading="lazy"><span>${esc(r[LANG])}</span></button>`).join('');
+  gallery.querySelectorAll('img').forEach(img => img.addEventListener('error', () => { img.parentElement.hidden = true; }));
+  gallery.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    const r = RENDERS[+b.dataset.i];
+    document.getElementById('lb-img').src = r.f; document.getElementById('lb-img').alt = r[LANG]; document.getElementById('lb-cap').textContent = r[LANG];
+    lightbox.hidden = false;
+  }));
+}
+document.getElementById('lb-close').addEventListener('click', () => { lightbox.hidden = true; });
+lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.hidden = true; });
+window.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.hidden = true; });
+function renderAll() { renderDetail(); renderSchedule(); renderStats(); renderPacks(); renderPlans(); renderGallery(); }
 
 /* ============================================================
    10. CHOICES + SHARED PLANS (db capability; falls back to this device)
